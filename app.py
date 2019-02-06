@@ -1,42 +1,103 @@
-from flask import Flask, request, abort
+# -*- coding: utf-8 -*-
 
+#  Licensed under the Apache License, Version 2.0 (the "License"); you may
+#  not use this file except in compliance with the License. You may obtain
+#  a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#  License for the specific language governing permissions and limitations
+#  under the License.
+
+import os
+import sys
+import wsgiref.simple_server
+from argparse import ArgumentParser
+
+from builtins import bytes
 from linebot import (
-    LineBotApi, WebhookHandler
+    LineBotApi, WebhookParser
 )
 from linebot.exceptions import (
     InvalidSignatureError
 )
-from linebot.models import *
+from linebot.models import (
+    MessageEvent, TextMessage, TextSendMessage
+)
+from linebot.utils import PY3
 
-app = Flask(__name__)
+# get channel_secret and channel_access_token from your environment variable
+channel_secret = '4fa1cd3db4950fafcdcc4b10fc4abd78'
+channel_access_token = 'A1bAwdQQlNuXHr39n9FlIWJUNU9o9eKp7PgBRgcZvylPXrxYL2rL/EzFqyElim1EvlaNx0Q2TK8Q0NhS6rWh/UQf+zH5gFdhDa4gFQf30aTWBkHLF7bqM+qRSDB4BdA+tG4oEj3KnnIpzxynrfZwKgdB04t89/1O/w1cDnyilFU='
+if channel_secret is None:
+    print('Specify LINE_CHANNEL_SECRET as environment variable.')
+    sys.exit(1)
+if channel_access_token is None:
+    print('Specify LINE_CHANNEL_ACCESS_TOKEN as environment variable.')
+    sys.exit(1)
 
-# Channel Access Token
-line_bot_api = LineBotApi('A1bAwdQQlNuXHr39n9FlIWJUNU9o9eKp7PgBRgcZvylPXrxYL2rL/EzFqyElim1EvlaNx0Q2TK8Q0NhS6rWh/UQf+zH5gFdhDa4gFQf30aTWBkHLF7bqM+qRSDB4BdA+tG4oEj3KnnIpzxynrfZwKgdB04t89/1O/w1cDnyilFU=')
-# Channel Secret
-handler = WebhookHandler('4fa1cd3db4950fafcdcc4b10fc4abd78')
+line_bot_api = LineBotApi(channel_access_token)
+parser = WebhookParser(channel_secret)
 
-# 監聽所有來自 /callback 的 Post Request
-@app.route("/callback", methods=['POST'])
-def callback():
+
+def application(environ, start_response):
+    # check request path
+    if environ['PATH_INFO'] != '/callback':
+        start_response('404 Not Found', [])
+        return create_body('Not Found')
+
+    # check request method
+    if environ['REQUEST_METHOD'] != 'POST':
+        start_response('405 Method Not Allowed', [])
+        return create_body('Method Not Allowed')
+
     # get X-Line-Signature header value
-    signature = request.headers['X-Line-Signature']
+    signature = environ['HTTP_X_LINE_SIGNATURE']
+
     # get request body as text
-    body = request.get_data(as_text=True)
-    app.logger.info("Request body: " + body)
-    # handle webhook body
+    wsgi_input = environ['wsgi.input']
+    content_length = int(environ['CONTENT_LENGTH'])
+    body = wsgi_input.read(content_length).decode('utf-8')
+
+    # parse webhook body
     try:
-        handler.handle(body, signature)
+        events = parser.parse(body, signature)
     except InvalidSignatureError:
-        abort(400)
-    return 'OK'
+        start_response('400 Bad Request', [])
+        return create_body('Bad Request')
 
-# 處理訊息
-@handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
-    message = TextSendMessage(text=event.message.text)
-    line_bot_api.reply_message(event.reply_token, message)
+    # if event is MessageEvent and message is TextMessage, then echo text
+    for event in events:
+        if not isinstance(event, MessageEvent):
+            continue
+        if not isinstance(event.message, TextMessage):
+            continue
 
-import os
-if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=event.message.text)
+        )
+
+    start_response('200 OK', [])
+    return create_body('OK')
+
+
+def create_body(text):
+    if PY3:
+        return [bytes(text, 'utf-8')]
+    else:
+        return text
+
+
+if __name__ == '__main__':
+    arg_parser = ArgumentParser(
+        usage='Usage: python ' + __file__ + ' [--port <port>] [--help]'
+    )
+    arg_parser.add_argument('-p', '--port', type=int, default=8000, help='port')
+    options = arg_parser.parse_args()
+
+    httpd = wsgiref.simple_server.make_server('', options.port, application)
+    httpd.serve_forever()
