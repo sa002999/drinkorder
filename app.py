@@ -4,7 +4,7 @@
 #  not use this file except in compliance with the License. You may obtain
 #  a copy of the License at
 #
-#       http://www.apache.org/licenses/LICENSE-2.0
+#       https://www.apache.org/licenses/LICENSE-2.0
 #
 #  Unless required by applicable law or agreed to in writing, software
 #  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -14,20 +14,20 @@
 
 import os
 import sys
-import wsgiref.simple_server
 from argparse import ArgumentParser
 
-from builtins import bytes
+from flask import Flask, request, abort
 from linebot import (
-    LineBotApi, WebhookParser
+    LineBotApi, WebhookHandler
 )
 from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage
+    MessageEvent, TextMessage, TextSendMessage,
 )
-from linebot.utils import PY3
+
+app = Flask(__name__)
 
 # get channel_secret and channel_access_token from your environment variable
 channel_secret = os.getenv('LINE_CHANNEL_SECRET', None)
@@ -40,64 +40,41 @@ if channel_access_token is None:
     sys.exit(1)
 
 line_bot_api = LineBotApi(channel_access_token)
-parser = WebhookParser(channel_secret)
+handler = WebhookHandler(channel_secret)
 
 
-def application(environ, start_response):
-    # check request path
-    if environ['PATH_INFO'] != '/callback':
-        start_response('404 Not Found', [])
-        return create_body('Not Found')
-
-    # check request method
-    if environ['REQUEST_METHOD'] != 'POST':
-        start_response('405 Method Not Allowed', [])
-        return create_body('Method Not Allowed')
-
+@app.route("/callback", methods=['POST'])
+def callback():
     # get X-Line-Signature header value
-    signature = environ['HTTP_X_LINE_SIGNATURE']
+    signature = request.headers['X-Line-Signature']
 
     # get request body as text
-    wsgi_input = environ['wsgi.input']
-    content_length = int(environ['CONTENT_LENGTH'])
-    body = wsgi_input.read(content_length).decode('utf-8')
+    body = request.get_data(as_text=True)
+    app.logger.info("Request body: " + body)
 
-    # parse webhook body
+    # handle webhook body
     try:
-        events = parser.parse(body, signature)
+        handler.handle(body, signature)
     except InvalidSignatureError:
-        start_response('400 Bad Request', [])
-        return create_body('Bad Request')
+        abort(400)
 
-    # if event is MessageEvent and message is TextMessage, then echo text
-    for event in events:
-        if not isinstance(event, MessageEvent):
-            continue
-        if not isinstance(event.message, TextMessage):
-            continue
-
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=event.message.text)
-        )
-
-    start_response('200 OK', [])
-    return create_body('OK')
+    return 'OK'
 
 
-def create_body(text):
-    if PY3:
-        return [bytes(text, 'utf-8')]
-    else:
-        return text
+@handler.add(MessageEvent, message=TextMessage)
+def message_text(event):
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=event.message.text)
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     arg_parser = ArgumentParser(
         usage='Usage: python ' + __file__ + ' [--port <port>] [--help]'
     )
-    arg_parser.add_argument('-p', '--port', type=int, default=8000, help='port')
+    arg_parser.add_argument('-p', '--port', default=8000, help='port')
+    arg_parser.add_argument('-d', '--debug', default=False, help='debug')
     options = arg_parser.parse_args()
 
-    httpd = wsgiref.simple_server.make_server('', options.port, application)
-    httpd.serve_forever()
+    app.run(debug=options.debug, port=options.port)
