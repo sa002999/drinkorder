@@ -46,7 +46,7 @@ def handle_message(event):
     
     msg = event.message.text
     
-    if msg == '揪團':
+    if msg == '菜單':
         DrinkVenders = TemplateSendMessage(
             alt_text='DrinkVenders',
             template=CarouselTemplate(
@@ -75,9 +75,63 @@ def handle_message(event):
             )
         )
         line_bot_api.reply_message(event.reply_token, DrinkVenders)
-    else:
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=msg))
+    
+    elif msg == '揪團':
+        SelectDrinkVender = TemplateSendMessage(
+            alt_text='SelectDrinkVender',
+            template=CarouselTemplate(
+                columns=[
+                    CarouselColumn(
+                        thumbnail_image_url='https://sites.google.com/site/50lanksu00/_/rsrc/1415903484528/config/customLogo.gif?revision=9',
+                        text='50嵐',
+                        actions=[
+                            PostbackAction(
+                                label='選擇',
+                                text='我要喝 50嵐',
+                                data='action=SelectDrinkVender&item=50blue'
+                            )
+                        ]
+                    ),
+                    CarouselColumn(
+                        thumbnail_image_url='https://foodtracer.taipei.gov.tw/Backend/upload/company/54591495/54591495_img2.jpg',
+                        text='一芳 台灣水果茶',
+                        actions=[
+                            PostbackAction(
+                                label='選擇',
+                                text='我要喝 一芳',
+                                data='action=SelectDrinkVender&item=yifang'
+                            )
+                        ]
+                    )
+                ]
+            )
+        )
 
+    else:
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text=msg))
+
+@handler.add(PostbackEvent)
+def handle_postback(event):
+    pattern = re.compile(r"(\S+)=(\S+)&(\S+)=(\S+)")
+    match = pattern.match(event.postback.data)
+
+    if match.group(2) == 'SelectDrinkVender':
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text=match.group(4)))
+    else:
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text=event.postback.data))
+
+    # if event.postback.data == 'ping':
+    #     line_bot_api.reply_message(
+    #         event.reply_token, TextSendMessage(text='pong'))
+    # elif event.postback.data == 'datetime_postback':
+    #     line_bot_api.reply_message(
+    #         event.reply_token, TextSendMessage(text=event.postback.params['datetime']))
+    # elif event.postback.data == 'date_postback':
+    #     line_bot_api.reply_message(
+    #         event.reply_token, TextSendMessage(text=event.postback.params['date']))
 
 # to avoid to let Heroku allocate port dynamically and then it will generate
 # error r10 (boot timeout). Here to appoint port directly.
