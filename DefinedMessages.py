@@ -1,7 +1,6 @@
 from linebot.models import *
 
 class DefinedMessages:
-
 	DrinkVenders = TemplateSendMessage(
 		alt_text='DrinkVenders',
 		template=CarouselTemplate(
@@ -29,3 +28,5 @@ class DefinedMessages:
 	        ]
 		)
 	)
+
+# print (DefinedMessages.DrinkVenders.template.columns[0].text)
