@@ -8,6 +8,7 @@ from linebot.exceptions import (
 )
 from linebot.models import *
 import os
+import DefinedMessages
 
 app = Flask(__name__)
 
@@ -40,14 +41,15 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    msg = event.message.text
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=msg))
-    print ('replyToken: ', event.reply_token)
-    print ('messageType: ', event.message.type)
-    print ('messageText: ', event.message.text)
     print (event)
+    
+    msg = event.message.text
+    
+    # line_bot_api.reply_message(
+    #     event.reply_token,
+    #     TextSendMessage(text=msg))
+    line_bot_api.reply_message(event.reply_token,DrinkVenders)
+    
     
 
 # to avoid to let Heroku allocate port dynamically and then it will generate
