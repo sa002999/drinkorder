@@ -8,7 +8,7 @@ from linebot.exceptions import (
 )
 from linebot.models import *
 import os
-import DefinedMessages
+from app.DefinedMessages import *
 
 app = Flask(__name__)
 
@@ -45,10 +45,11 @@ def handle_message(event):
     
     msg = event.message.text
     
-    # line_bot_api.reply_message(
-    #     event.reply_token,
-    #     TextSendMessage(text=msg))
-    line_bot_api.reply_message(event.reply_token,DrinkVenders)
+    if msg == '揪團':
+        line_bot_api.reply_message(event.reply_token,DefinedMessages.DrinkVenders)
+    else:
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=msg))
+
     
     
 
