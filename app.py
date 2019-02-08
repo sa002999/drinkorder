@@ -6,20 +6,20 @@ from linebot import (
 from linebot.exceptions import (
     InvalidSignatureError
 )
-from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,
-)
+from linebot.models import *
 import os
 
 app = Flask(__name__)
 
-#環境変数取得
+# get enviroment variables
 YOUR_CHANNEL_ACCESS_TOKEN = os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
 YOUR_CHANNEL_SECRET = os.environ["LINE_CHANNEL_SECRET"]
 
 line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 
+# callback function. Line will send 'POST' message to 
+# webhook url whenever user send chatbot some messages.
 @app.route("/callback", methods=['POST'])
 def callback():
     # get X-Line-Signature header value
@@ -40,11 +40,18 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    msg = event.message.text
     line_bot_api.reply_message(
         event.reply_token,
-        TextSendMessage(text=event.message.text))
+        TextSendMessage(text=msg))
+    print ('replyToken: ', event.reply_token)
+    print ('messageType: ', event.message.type)
+    print ('messageText: ', event.message.text)
+    print (event)
+    
 
-
+# to avoid to let Heroku allocate port dynamically and then it will generate
+# error r10 (boot timeout). Here to appoint port directly.
 if __name__ == "__main__":
 #    app.run()
     port = int(os.getenv("PORT", 5000))
