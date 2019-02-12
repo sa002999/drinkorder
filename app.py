@@ -8,6 +8,7 @@ from linebot.exceptions import (
 )
 from linebot.models import *
 import os
+from dbModel import *
 
 app = Flask(__name__)
 
@@ -118,21 +119,67 @@ def handle_postback(event):
     match = pattern.match(event.postback.data)
 
     if match.group(2) == 'SelectDrinkVender':
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=match.group(4)))
+        ConfirmGroupOrder = TemplateSendMessage(
+            alt_text='ConfirmGroupOrder',
+            template=ConfirmTemplate(
+                text='您確定要揪[{0}]嗎？'.format(match.group(4)),
+                actions=[
+                    PostbackAction(
+                        label='是',
+                        text='是',
+                        data='action=LaunchGroupOrder&item=True'
+                    ),
+                    PostbackAction(
+                        label='否',
+                        text='否',
+                        data='action=LaunchGroupOrder&item=False'
+                    )
+                ]
+            )
+        )
+        line_bot_api.reply_message(event.reply_token, ConfirmGroupOrder)
+
+    elif match.group(2) == 'LaunchGroupOrder':
+        line_bot_api.multicast(['to1', 'to2'], TextSendMessage(text='Hello World!'))
+
     else:
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=event.postback.data))
 
-    # if event.postback.data == 'ping':
-    #     line_bot_api.reply_message(
-    #         event.reply_token, TextSendMessage(text='pong'))
-    # elif event.postback.data == 'datetime_postback':
-    #     line_bot_api.reply_message(
-    #         event.reply_token, TextSendMessage(text=event.postback.params['datetime']))
-    # elif event.postback.data == 'date_postback':
-    #     line_bot_api.reply_message(
-    #         event.reply_token, TextSendMessage(text=event.postback.params['date']))
+@handler.add(FollowEvent)
+def handle_follow(event):
+    user_id = event.source.userId
+    profile = line_bot_api.get_profile(user_id)
+
+    # check if the database already has this user
+    result = UserData.query.filter_by(UserID=user_id).first()
+    
+    # if not, add it to database
+    if result is None:
+        insert_data = UserData(DisplayName=profile.display_name
+                             , UserID=profile.user_id
+                             , PictureURL=profile.picture_url
+                             , StatusMessage=profile.status_message
+                              )
+        db.session.add(insert_data)
+        db.session.commit()
+
+    print (profile.display_name + " added you as a friend.")
+
+@handler.add(UnfollowEvent)
+def handle_unfollow():
+    user_id = event.source.userId
+    profile = line_bot_api.get_profile(user_id)
+
+    # check if the database already has this user
+    result = UserData.query.filter_by(UserID=user_id).first()
+
+    # if yes, delete it to database
+    if result not None: 
+        db.session.delete(result)
+        db.session.commit()
+
+    print ("You are blocked by: " + profile.display_name)
 
 # to avoid to let Heroku allocate port dynamically and then it will generate
 # error r10 (boot timeout). Here to appoint port directly.
