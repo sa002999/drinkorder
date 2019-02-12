@@ -8,7 +8,7 @@ line-bot-sdk==1.8.0
 # Psycopg is the most popular PostgreSQL 
 # database adapter for the Python 
 # programming language.
-psycopg2==2.7.6
+psycopg2-binary==2.7.6
 
 # Adds SQLAlchemy support to Flask.
 Flask-SQLAlchemy==2.1
