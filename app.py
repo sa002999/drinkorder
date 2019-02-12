@@ -10,7 +10,7 @@ from linebot.models import *
 import os
 from dbModel import *
 
-app = Flask(__name__)
+# app = Flask(__name__)
 
 # get enviroment variables
 # YOUR_CHANNEL_ACCESS_TOKEN = os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
