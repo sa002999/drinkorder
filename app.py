@@ -148,14 +148,23 @@ def handle_postback(event):
 
 @handler.add(FollowEvent)
 def handle_follow(event):
+    print ("FollowEvent occured.")
     user_id = event.source.userId
-    profile = line_bot_api.get_profile(user_id)
+
+    try:
+        profile = line_bot_api.get_profile(user_id)
+    except LineBotApiError as e:
+        print(e.status_code)
+        print(e.error.message)
+        print(e.error.details)
+        return
 
     # check if the database already has this user
     result = UserData.query.filter_by(UserID=user_id).first()
     
     # if not, add it to database
     if result is None:
+        print ("FollowEvent: Unregistered User")
         insert_data = UserData(DisplayName=profile.display_name
                              , UserID=profile.user_id
                              , PictureURL=profile.picture_url
@@ -164,22 +173,31 @@ def handle_follow(event):
         db.session.add(insert_data)
         db.session.commit()
 
-    print (profile.display_name + " added you as a friend.")
+    print ("FollowEvent: " + profile.display_name + " added you as a friend.")
 
 @handler.add(UnfollowEvent)
 def handle_unfollow():
+    print ("UnfollowEvent occured.")
     user_id = event.source.userId
-    profile = line_bot_api.get_profile(user_id)
+
+    try:
+        profile = line_bot_api.get_profile(user_id)
+    except LineBotApiError as e:
+        print(e.status_code)
+        print(e.error.message)
+        print(e.error.details)
+        return
 
     # check if the database already has this user
     result = UserData.query.filter_by(UserID=user_id).first()
 
     # if yes, delete it to database
     if result not None: 
+        print ("UnfollowEvent: Registered User. Proceed to delete it from database")
         db.session.delete(result)
         db.session.commit()
 
-    print ("You are blocked by: " + profile.display_name)
+    print ("UnfollowEvent: You are blocked by " + profile.display_name)
 
 # to avoid to let Heroku allocate port dynamically and then it will generate
 # error r10 (boot timeout). Here to appoint port directly.

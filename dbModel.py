@@ -22,9 +22,9 @@ class UserData(db.Model):
     UserID = db.Column(db.String(64))
     PictureURL = db.Column(db.String(256))
     StatusMessage = db.Column(db.String(256))
-    CreateDate = db.Column(db.DateTime
-                           , server_default=db.func.current_timestamp()
-                           , server_onupdate=db.func.current_timestamp())
+    CreateDate = db.Column(db.DateTime)
+                           # , server_default=db.func.current_timestamp()
+                           # , server_onupdate=db.func.current_timestamp())
 
     def __init__(self
                  , DisplayName
