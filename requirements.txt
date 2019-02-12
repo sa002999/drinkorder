@@ -1,6 +1,28 @@
+# The Python micro framework for 
+# building web applications.
 Flask==1.0.2
+
+# SDK of the LINE Messaging API for Python.
 line-bot-sdk==1.8.0
-psycopg2==2.6.7
+
+# Psycopg is the most popular PostgreSQL 
+# database adapter for the Python 
+# programming language.
+psycopg2==2.7.6
+
+# Adds SQLAlchemy support to Flask.
 Flask-SQLAlchemy==2.3
+
+# Flask-Migrate is an extension that 
+# handles SQLAlchemy database migrations 
+# for Flask applications using Alembic.
 Flask-Migrate==2.3.1
+
+# The Flask-Script extension provides support 
+# for writing external scripts in Flask. This 
+# includes running a development server, a 
+# customised Python shell, scripts to set up 
+# your database, cronjobs, and other 
+# command-line tasks that belong outside the 
+# web application itself.
 Flask-Script==2.0.6
