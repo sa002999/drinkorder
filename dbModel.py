@@ -41,3 +41,4 @@ class UserData(db.Model):
 
 if __name__ == '__main__':
     manager.run()
+    print ("Manager run")

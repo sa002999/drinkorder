@@ -180,14 +180,6 @@ def handle_unfollow(event):
     print ("UnfollowEvent occured.")
     user_id = event.source.user_id
 
-    try:
-        profile = line_bot_api.get_profile(user_id)
-    except LineBotApiError as e:
-        print(e.status_code)
-        print(e.error.message)
-        print(e.error.details)
-        # return
-
     # check if the database already has this user
     result = UserData.query.filter_by(UserID=user_id).first()
 
@@ -197,7 +189,7 @@ def handle_unfollow(event):
         db.session.delete(result)
         db.session.commit()
 
-    print ("UnfollowEvent: You are blocked by " + profile.display_name)
+    print ("UnfollowEvent: You are blocked by UserID: " + user_id)
 
 # to avoid to let Heroku allocate port dynamically and then it will generate
 # error r10 (boot timeout). Here to appoint port directly.
