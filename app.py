@@ -192,7 +192,7 @@ def handle_unfollow():
     result = UserData.query.filter_by(UserID=user_id).first()
 
     # if yes, delete it to database
-    if result not None: 
+    if not result is None: 
         print ("UnfollowEvent: Registered User. Proceed to delete it from database")
         db.session.delete(result)
         db.session.commit()
