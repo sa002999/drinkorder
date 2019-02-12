@@ -176,7 +176,7 @@ def handle_follow(event):
     print ("FollowEvent: " + profile.display_name + " added you as a friend.")
 
 @handler.add(UnfollowEvent)
-def handle_unfollow():
+def handle_unfollow(event):
     print ("UnfollowEvent occured.")
     user_id = event.source.user_id
 
