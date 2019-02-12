@@ -4,13 +4,13 @@ from linebot import (
     LineBotApi, WebhookHandler
 )
 from linebot.exceptions import (
-    InvalidSignatureError
+    InvalidSignatureError, LineBotApiError
 )
 from linebot.models import *
 import os
 from dbModel import *
 
-# app = Flask(__name__)
+app = Flask(__name__)
 
 # get enviroment variables
 # YOUR_CHANNEL_ACCESS_TOKEN = os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
@@ -153,7 +153,7 @@ def handle_follow(event):
 
     try:
         profile = line_bot_api.get_profile(user_id)
-    except linebot.exceptions.LineBotApiError as e:
+    except LineBotApiError as e:
         print(e.status_code)
         print(e.error.message)
         print(e.error.details)
@@ -182,7 +182,7 @@ def handle_unfollow(event):
 
     try:
         profile = line_bot_api.get_profile(user_id)
-    except linebot.exceptions.LineBotApiError as e:
+    except LineBotApiError as e:
         print(e.status_code)
         print(e.error.message)
         print(e.error.details)
