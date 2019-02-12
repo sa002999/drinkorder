@@ -149,7 +149,7 @@ def handle_postback(event):
 @handler.add(FollowEvent)
 def handle_follow(event):
     print ("FollowEvent occured.")
-    user_id = event.source.userId
+    user_id = event.source.user_id
 
     try:
         profile = line_bot_api.get_profile(user_id)
@@ -157,7 +157,7 @@ def handle_follow(event):
         print(e.status_code)
         print(e.error.message)
         print(e.error.details)
-        return
+        # return
 
     # check if the database already has this user
     result = UserData.query.filter_by(UserID=user_id).first()
@@ -178,7 +178,7 @@ def handle_follow(event):
 @handler.add(UnfollowEvent)
 def handle_unfollow():
     print ("UnfollowEvent occured.")
-    user_id = event.source.userId
+    user_id = event.source.user_id
 
     try:
         profile = line_bot_api.get_profile(user_id)
@@ -186,7 +186,7 @@ def handle_unfollow():
         print(e.status_code)
         print(e.error.message)
         print(e.error.details)
-        return
+        # return
 
     # check if the database already has this user
     result = UserData.query.filter_by(UserID=user_id).first()
