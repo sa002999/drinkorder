@@ -26,3 +26,7 @@ Flask-Migrate==2.3.1
 # command-line tasks that belong outside the 
 # web application itself.
 Flask-Script==2.0.6
+
+# Gunicorn 'Green Unicorn' is a Python WSGI 
+# HTTP Server for UNIX.
+gunicorn==19.9.0
