@@ -11,7 +11,7 @@ line-bot-sdk==1.8.0
 psycopg2==2.7.6
 
 # Adds SQLAlchemy support to Flask.
-Flask-SQLAlchemy==2.3
+Flask-SQLAlchemy==2.0
 
 # Flask-Migrate is an extension that 
 # handles SQLAlchemy database migrations 
