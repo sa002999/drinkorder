@@ -153,7 +153,7 @@ def handle_follow(event):
 
     try:
         profile = line_bot_api.get_profile(user_id)
-    except LineBotApiError as e:
+    except linebot.exceptions.LineBotApiError as e:
         print(e.status_code)
         print(e.error.message)
         print(e.error.details)
@@ -182,7 +182,7 @@ def handle_unfollow(event):
 
     try:
         profile = line_bot_api.get_profile(user_id)
-    except LineBotApiError as e:
+    except linebot.exceptions.LineBotApiError as e:
         print(e.status_code)
         print(e.error.message)
         print(e.error.details)
