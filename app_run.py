@@ -13,13 +13,23 @@ from dbModel import *
 app = Flask(__name__)
 
 # get enviroment variables
-# YOUR_CHANNEL_ACCESS_TOKEN = os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
-# YOUR_CHANNEL_SECRET = os.environ["LINE_CHANNEL_SECRET"]
-YOUR_CHANNEL_ACCESS_TOKEN = 'A1bAwdQQlNuXHr39n9FlIWJUNU9o9eKp7PgBRgcZvylPXrxYL2rL/EzFqyElim1EvlaNx0Q2TK8Q0NhS6rWh/UQf+zH5gFdhDa4gFQf30aTWBkHLF7bqM+qRSDB4BdA+tG4oEj3KnnIpzxynrfZwKgdB04t89/1O/w1cDnyilFU='
-YOUR_CHANNEL_SECRET = '4fa1cd3db4950fafcdcc4b10fc4abd78'
+YOUR_CHANNEL_ACCESS_TOKEN = os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
+YOUR_CHANNEL_SECRET = os.environ["LINE_CHANNEL_SECRET"]
+# YOUR_CHANNEL_ACCESS_TOKEN = 'A1bAwdQQlNuXHr39n9FlIWJUNU9o9eKp7PgBRgcZvylPXrxYL2rL/EzFqyElim1EvlaNx0Q2TK8Q0NhS6rWh/UQf+zH5gFdhDa4gFQf30aTWBkHLF7bqM+qRSDB4BdA+tG4oEj3KnnIpzxynrfZwKgdB04t89/1O/w1cDnyilFU='
+# YOUR_CHANNEL_SECRET = '4fa1cd3db4950fafcdcc4b10fc4abd78'
 
 line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
+
+# declare a dictionary
+dict = {
+    '50blue_name': '50嵐',
+    '50blue_image': 'https://sites.google.com/site/50lanksu00/_/rsrc/1415903484528/config/customLogo.gif?revision=9', 
+    '50nlue_recipe': 'https://bearteach.com/wp-content/uploads/02-149.jpg', 
+    'yifang_name': '一芳 台灣水果茶',
+    'yifang_image': 'https://foodtracer.taipei.gov.tw/Backend/upload/company/54591495/54591495_img2.jpg',
+    'yifang_recipe': 'http://www.yifangtea.com.tw/upload/menu/1901020908450000001.jpg'
+}
 
 # callback function. Line will send 'POST' message to 
 # webhook url whenever user send chatbot some messages.
@@ -53,22 +63,22 @@ def handle_message(event):
             template=CarouselTemplate(
                 columns=[
                     CarouselColumn(
-                        thumbnail_image_url='https://sites.google.com/site/50lanksu00/_/rsrc/1415903484528/config/customLogo.gif?revision=9',
-                        text='50嵐',
+                        thumbnail_image_url=dict['50blue_image'],
+                        text=dict['50blue_name'],
                         actions=[
                             URIAction(
                                 label='菜單',
-                                uri='https://bearteach.com/wp-content/uploads/02-149.jpg'
+                                uri=dict['50nlue_recipe']
                             )
                         ]
                     ),
                     CarouselColumn(
-                        thumbnail_image_url='https://foodtracer.taipei.gov.tw/Backend/upload/company/54591495/54591495_img2.jpg',
-                        text='一芳 台灣水果茶',
+                        thumbnail_image_url=dict['yifang_image'],
+                        text=dict['yifang_name'],
                         actions=[
                             URIAction(
                                 label='菜單',
-                                uri='http://www.yifangtea.com.tw/upload/menu/1901020908450000001.jpg'
+                                uri=dict['yifang_recipe']
                             )
                         ]
                     )
@@ -83,23 +93,23 @@ def handle_message(event):
             template=CarouselTemplate(
                 columns=[
                     CarouselColumn(
-                        thumbnail_image_url='https://sites.google.com/site/50lanksu00/_/rsrc/1415903484528/config/customLogo.gif?revision=9',
-                        text='50嵐',
+                        thumbnail_image_url=dict['50blue_image'],
+                        text=dict['50blue_name'],
                         actions=[
                             PostbackAction(
                                 label='選擇',
-                                text='我要喝 50嵐',
+                                text='我要喝 {0}}'.format(dict['50blue_name']),
                                 data='action=SelectDrinkVender&item=50blue'
                             )
                         ]
                     ),
                     CarouselColumn(
-                        thumbnail_image_url='https://foodtracer.taipei.gov.tw/Backend/upload/company/54591495/54591495_img2.jpg',
-                        text='一芳 台灣水果茶',
+                        thumbnail_image_url=dict['yifang_image'],
+                        text=dict['yifang_name'],
                         actions=[
                             PostbackAction(
                                 label='選擇',
-                                text='我要喝 一芳',
+                                text='我要喝 {0}'.format(dict['yifang_name']),
                                 data='action=SelectDrinkVender&item=yifang'
                             )
                         ]
@@ -115,6 +125,7 @@ def handle_message(event):
 
 @handler.add(PostbackEvent)
 def handle_postback(event):
+    # postback message: action=%s&item=%s
     pattern = re.compile(r"(\S+)=(\S+)&(\S+)=(\S+)")
     match = pattern.match(event.postback.data)
 
@@ -127,12 +138,11 @@ def handle_postback(event):
                     PostbackAction(
                         label='是',
                         text='是',
-                        data='action=LaunchGroupOrder&item=True'
+                        data='action=LaunchGroupOrder&item={0}}'.format(match.group(4))
                     ),
-                    PostbackAction(
+                    MessageAction(
                         label='否',
-                        text='否',
-                        data='action=LaunchGroupOrder&item=False'
+                        text='否'
                     )
                 ]
             )
@@ -140,7 +150,55 @@ def handle_postback(event):
         line_bot_api.reply_message(event.reply_token, ConfirmGroupOrder)
 
     elif match.group(2) == 'LaunchGroupOrder':
-        line_bot_api.multicast(['to1', 'to2'], TextSendMessage(text='Hello World!'))
+
+        # query userID of all my friends from database
+        ResultSet = UserData.query.all()
+
+        # creat a list of userID before broadcast drink order message
+        userID = []
+        for _userid in ResultSet:
+            userID.append(_userid)
+
+        # Get launcher's profile
+        try:
+            profile = line_bot_api.get_profile(event.source.user_id)
+        except LineBotApiError as e:
+            print(e.status_code)
+            print(e.error.message)
+            print(e.error.details)
+
+        broadcastMessage = '哈囉! {0}口渴想要喝{1}，有人要跟嗎？'
+            .format('profile.display_name', dict['{0}_name'.format(match.group(4))])
+
+        confirmLaunch = TemplateSendMessage(
+            alt_text='Buttons template',
+            template=ButtonsTemplate(
+                thumbnail_image_url=dict['{0}_image'.format(match.group(4),
+                text='請選擇動作...',
+                actions=[
+                    PostbackAction(
+                        label='postback',
+                        text='postback text',
+                        data='action=buy&itemid=1'
+                    ),
+                    MessageAction(
+                        label='message',
+                        text='message text'
+                    ),
+                    URIAction(
+                        label='uri',
+                        uri='http://example.com/'
+                    )
+                ]
+            )
+        )
+
+        line_bot_api.multicast(userID, 
+            messages=[
+                TextSendMessage(text=broadcastMessage),
+
+            ]
+        )
 
     else:
         line_bot_api.reply_message(
@@ -157,7 +215,6 @@ def handle_follow(event):
         print(e.status_code)
         print(e.error.message)
         print(e.error.details)
-        # return
 
     # check if the database already has this user
     result = UserData.query.filter_by(UserID=user_id).first()
