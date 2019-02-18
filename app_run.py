@@ -98,7 +98,7 @@ def handle_message(event):
                         actions=[
                             PostbackAction(
                                 label='選擇',
-                                text='我要喝 {0}}'.format(dict['50blue_name']),
+                                text='我要喝 {0}'.format(dict['50blue_name']),
                                 data='action=SelectDrinkVender&item=50blue'
                             )
                         ]
