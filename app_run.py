@@ -7,7 +7,7 @@ from linebot.exceptions import (
     InvalidSignatureError, LineBotApiError
 )
 from linebot.models import *
-import os
+import os, re
 from dbModel import *
 
 app = Flask(__name__)
