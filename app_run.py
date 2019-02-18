@@ -167,13 +167,13 @@ def handle_postback(event):
             print(e.error.message)
             print(e.error.details)
 
-        broadcastMessage = '哈囉! {0}口渴想要喝{1}，有人要跟嗎？'
-            .format('profile.display_name', dict['{0}_name'.format(match.group(4))])
+        drinkVender = '{0}_name'.format(match.group(4))
+        broadcastMessage = '哈囉! {0}口渴想要喝{1}，有人要跟嗎？'.format('profile.display_name', dict[drinkVender])
 
         confirmLaunch = TemplateSendMessage(
             alt_text='Buttons template',
             template=ButtonsTemplate(
-                thumbnail_image_url=dict['{0}_image'.format(match.group(4),
+                thumbnail_image_url=dict[drinkVender],
                 text='請選擇動作...',
                 actions=[
                     PostbackAction(
