@@ -138,7 +138,7 @@ def handle_postback(event):
                     PostbackAction(
                         label='是',
                         text='是',
-                        data='action=LaunchGroupOrder&item={0}}'.format(match.group(4))
+                        data='action=LaunchGroupOrder&item={0}'.format(match.group(4))
                     ),
                     MessageAction(
                         label='否',
