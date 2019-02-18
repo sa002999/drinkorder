@@ -98,7 +98,7 @@ def handle_message(event):
                         actions=[
                             PostbackAction(
                                 label='選擇',
-                                text='我要喝 {0}'.format(dict['50blue_name']),
+                                text='我要喝 {0}2'.format(dict['50blue_name']),
                                 data='action=SelectDrinkVender&item=50blue'
                             )
                         ]
@@ -121,7 +121,7 @@ def handle_message(event):
 
     else:
         line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=msg))
+            event.reply_token, TextSendMessage(text=msg + '3'))
 
 @handler.add(PostbackEvent)
 def handle_postback(event):
@@ -130,10 +130,11 @@ def handle_postback(event):
     match = pattern.match(event.postback.data)
 
     if match.group(2) == 'SelectDrinkVender':
+        drinkVender = '{0}_name'.format(match.group(4))
         ConfirmGroupOrder = TemplateSendMessage(
             alt_text='ConfirmGroupOrder',
             template=ConfirmTemplate(
-                text='您確定要揪[{0}]嗎？'.format(match.group(4)),
+                text='您確定要揪 {0} 嗎？'.format(dict[drinkVender]),
                 actions=[
                     PostbackAction(
                         label='是',
@@ -192,17 +193,18 @@ def handle_postback(event):
                 ]
             )
         )
+        line_bot_api.reply_message(event.reply_token, confirmLaunch)
 
-        line_bot_api.multicast(userID, 
-            messages=[
-                TextSendMessage(text=broadcastMessage),
+        # line_bot_api.multicast(userID, 
+        #     messages=[
+        #         TextSendMessage(text=broadcastMessage),
 
-            ]
-        )
+        #     ]
+        # )
 
     else:
         line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=event.postback.data))
+            event.reply_token, TextSendMessage(text=event.postback.data + '4'))
 
 @handler.add(FollowEvent)
 def handle_follow(event):
