@@ -60,7 +60,7 @@ def handle_message(event):
     msg = event.message.text
     # message: 團號/尺寸/品名/甜度/冰塊
     pattern = re.compile(r"(\S+)/(\S+)/(\S+)/(\S+)/(\S+)")
-    match = pattern.match(event.postback.data)
+    match = pattern.match(msg)
     
     if msg == '招喚菜單':
         DrinkVenders = TemplateSendMessage(
