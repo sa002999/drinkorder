@@ -26,7 +26,7 @@ handler = WebhookHandler(YOUR_CHANNEL_SECRET)
 dict = {
     '50blue_name': '50嵐',
     '50blue_image': 'https://sites.google.com/site/50lanksu00/_/rsrc/1415903484528/config/customLogo.gif?revision=9', 
-    '50nlue_recipe': 'https://bearteach.com/wp-content/uploads/02-149.jpg', 
+    '50blue_recipe': 'https://bearteach.com/wp-content/uploads/02-149.jpg', 
     'yifang_name': '一芳 台灣水果茶',
     'yifang_image': 'https://foodtracer.taipei.gov.tw/Backend/upload/company/54591495/54591495_img2.jpg',
     'yifang_recipe': 'http://www.yifangtea.com.tw/upload/menu/1901020908450000001.jpg'
