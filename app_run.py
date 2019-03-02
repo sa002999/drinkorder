@@ -268,7 +268,7 @@ def handle_postback(event):
                         ),
                         PostbackAction(
                             label='跟團',
-                            data='action=FollowOrder&itemid={0}'.format(ResultSet[0].Id)
+                            data='action=FollowOrder&itemid={0}'.format(ResultSet.Id)
                         )
                     ]
                 )
