@@ -73,7 +73,7 @@ def handle_message(event):
                         actions=[
                             URIAction(
                                 label='菜單',
-                                uri=dict['50nlue_recipe']
+                                uri=dict['50blue_recipe']
                             )
                         ]
                     ),
@@ -264,7 +264,7 @@ def handle_postback(event):
                     actions=[
                         URIAction(
                             label='菜單',
-                            uri=dict[recipeURL]
+                            uri='{0}'.format(dict[recipeURL])
                         ),
                         PostbackAction(
                             label='跟團',
