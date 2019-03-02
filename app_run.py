@@ -235,7 +235,7 @@ def handle_postback(event):
             # creat a list of userID before broadcast drink order message
             userIDs = []
             for _userid in ResultSet:
-                userIDs.append(_userid)
+                userIDs.append(_userid.UserID)
 
 
             drinkVender = '{0}_name'.format(match.group(4))
