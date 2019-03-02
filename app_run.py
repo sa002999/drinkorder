@@ -302,10 +302,12 @@ def handle_postback(event):
                     團號/尺寸/品名/甜度/冰塊
                     Ex: 1/大/珍珠奶茶/半糖/去冰
                     '''
-                ),
-                TextSendMessage(text='你所選擇的揪團團號是: {0}'.format(match.group(4))
                 )
             )
+            line_bot_api.push_message(
+                event.source.user_id, 
+                TextSendMessage(text='你所選擇的揪團團號是: {0}'.format(match.group(4))))
+
 
 @handler.add(FollowEvent)
 def handle_follow(event):
