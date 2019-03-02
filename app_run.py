@@ -240,6 +240,7 @@ def handle_postback(event):
 
             drinkVender = '{0}_name'.format(match.group(4))
             recipeURL = '{0}_recipe'.format(match.group(4))
+            drinkVenderImage = '{0}_image'.format(match.group(4))
             broadcastMessage = '哈囉! {0}口渴想要喝{1}，有人要跟嗎？'.\
                 format(profile.display_name, dict[drinkVender])
 
@@ -259,7 +260,7 @@ def handle_postback(event):
             confirmLaunch = TemplateSendMessage(
                 alt_text='Buttons template',
                 template=ButtonsTemplate(
-                    thumbnail_image_url=dict[drinkVender],
+                    thumbnail_image_url=dict[drinkVenderImage],
                     text='請選擇動作或者是忽視這則訊息',
                     actions=[
                         URIAction(
