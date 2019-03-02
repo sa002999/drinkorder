@@ -9,6 +9,7 @@ from linebot.exceptions import (
 from linebot.models import *
 import os, re
 from dbModel import *
+import datetime
 
 app = Flask(__name__)
 
@@ -30,6 +31,8 @@ dict = {
     'yifang_image': 'https://foodtracer.taipei.gov.tw/Backend/upload/company/54591495/54591495_img2.jpg',
     'yifang_recipe': 'http://www.yifangtea.com.tw/upload/menu/1901020908450000001.jpg'
 }
+
+ORDER_EXPIRED_TIME = 120  # minute
 
 # callback function. Line will send 'POST' message to 
 # webhook url whenever user send chatbot some messages.
@@ -53,11 +56,13 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    print (event)
     
     msg = event.message.text
+    # message: 團號/尺寸/品名/甜度/冰塊
+    pattern = re.compile(r"(\S+)/(\S+)/(\S+)/(\S+)/(\S+)")
+    match = pattern.match(event.postback.data)
     
-    if msg == '菜單':
+    if msg == '招喚菜單':
         DrinkVenders = TemplateSendMessage(
             alt_text='DrinkVenders',
             template=CarouselTemplate(
@@ -87,7 +92,7 @@ def handle_message(event):
         )
         line_bot_api.reply_message(event.reply_token, DrinkVenders)
     
-    elif msg == '揪團':
+    elif msg == '我要揪團':
         SelectDrinkVender = TemplateSendMessage(
             alt_text='SelectDrinkVender',
             template=CarouselTemplate(
@@ -98,7 +103,6 @@ def handle_message(event):
                         actions=[
                             PostbackAction(
                                 label='選擇',
-                                text='我要喝 {0}2'.format(dict['50blue_name']),
                                 data='action=SelectDrinkVender&item=50blue'
                             )
                         ]
@@ -109,7 +113,6 @@ def handle_message(event):
                         actions=[
                             PostbackAction(
                                 label='選擇',
-                                text='我要喝 {0}'.format(dict['yifang_name']),
                                 data='action=SelectDrinkVender&item=yifang'
                             )
                         ]
@@ -119,9 +122,63 @@ def handle_message(event):
         )
         line_bot_api.reply_message(event.reply_token, SelectDrinkVender)
 
+    elif not match is None:
+
+        # Check if the order_id is correct or not.
+        ExpireDatetime = datetime.datetime.now() - datetime.timedelta(minutes=ORDER_EXPIRED_TIME)
+        ResultSet1 = OrderList.query.\
+                filter(OrderList.Id==match.group(1)).\
+                filter(OrderList.CreateDate > ExpireDatetime).\
+                first()
+
+        # Check if there is repeated orderer in the same order.
+        ResultSet2 = OrderDetail.query.\
+                filter(OrderDetail.Order_Index==match.group(1)).\
+                filter(OrderDetail.Orderer==event.source.user_id).\
+                first()
+
+        if ResultSet1 is None:
+            line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(
+                        text='團號 {0} 有誤，可能是錯誤輸入或者是該團號之揪團已過期。'.format(match.group(1))
+                    )
+            )
+        elif not ResultSet1 is None and ResultSet2 is None:
+            try:
+                # message: 團號/尺寸/品名/甜度/冰塊
+                insert_data = OrderDetail(Order_Index = match.group(1)
+                                        , Orderer = event.source.user_id
+                                        , Drink_Size = match.group(2)
+                                        , Drink_Item = match.group(3)
+                                        , Drink_Ice = match.group(4)
+                                        , Drink_Sugar = match.group(5)
+                                         )
+                db.session.add(insert_data)
+                db.session.commit()
+
+                ResultSet = UserData.query.\
+                    filter(UserData.UserID==event.source.user_id).\
+                    first()
+
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(
+                        text='點單訊息收到，已統計至 {0} 的揪團中，後續狀況請洽詢揪團發起人。'.\
+                        format(ResultSet.DisplayName)
+                    )
+                )
+
+            except LineBotApiError as e:
+                print(e.status_code)
+                print(e.error.message)
+                print(e.error.details)
+
+
+
     else:
         line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=msg + '3'))
+            event.reply_token, TextSendMessage(text=msg))
 
 @handler.add(PostbackEvent)
 def handle_postback(event):
@@ -138,27 +195,18 @@ def handle_postback(event):
                 actions=[
                     PostbackAction(
                         label='是',
-                        text='是',
                         data='action=LaunchGroupOrder&item={0}'.format(match.group(4))
                     ),
-                    MessageAction(
+                    PostbackAction(
                         label='否',
-                        text='否'
-                    )
+                        data='action=None&item=False'
+                    ),
                 ]
             )
         )
         line_bot_api.reply_message(event.reply_token, ConfirmGroupOrder)
 
     elif match.group(2) == 'LaunchGroupOrder':
-
-        # query userID of all my friends from database
-        ResultSet = UserData.query.all()
-
-        # creat a list of userID before broadcast drink order message
-        userID = []
-        for _userid in ResultSet:
-            userID.append(_userid)
 
         # Get launcher's profile
         try:
@@ -168,43 +216,95 @@ def handle_postback(event):
             print(e.error.message)
             print(e.error.details)
 
-        drinkVender = '{0}_name'.format(match.group(4))
-        broadcastMessage = '哈囉! {0}口渴想要喝{1}，有人要跟嗎？'.format('profile.display_name', dict[drinkVender])
+        # Check if there is repeated order.
+        # The order created within 4 hours is valid.
+        ExpireDatetime = datetime.datetime.now() - datetime.timedelta(minutes=ORDER_EXPIRED_TIME)
+        ResultSet = OrderList.query.\
+            filter(OrderList.Creator==profile.user_id).\
+            filter(OrderList.CreateDate > ExpireDatetime).\
+            first()
 
-        confirmLaunch = TemplateSendMessage(
-            alt_text='Buttons template',
-            template=ButtonsTemplate(
-                thumbnail_image_url=dict[drinkVender],
-                text='請選擇動作...',
-                actions=[
-                    PostbackAction(
-                        label='postback',
-                        text='postback text',
-                        data='action=buy&itemid=1'
-                    ),
-                    MessageAction(
-                        label='message',
-                        text='message text'
-                    ),
-                    URIAction(
-                        label='uri',
-                        uri='http://example.com/'
-                    )
+        if not ResultSet is None:
+            line_bot_api.reply_message(
+                event.reply_token, TextSendMessage(text="你曾在四小時以內揪團過了，請查看揪團狀況。"))
+        else:
+
+            # query userID of all my friends from database
+            ResultSet = UserData.query.all()
+
+            # creat a list of userID before broadcast drink order message
+            userIDs = []
+            for _userid in ResultSet:
+                userIDs.append(_userid)
+
+
+            drinkVender = '{0}_name'.format(match.group(4))
+            recipeURL = '{0}_recipe'.format(match.group(4))
+            broadcastMessage = '哈囉! {0}口渴想要喝{1}，有人要跟嗎？'.\
+                format(profile.display_name, dict[drinkVender])
+
+            # Insert a new drink order into database 'OrderList'.
+            insert_data = OrderList(Creator=profile.user_id
+                                  , DrinkVender=dict[drinkVender]
+                                  )
+            db.session.add(insert_data)
+            db.session.commit()
+
+            ResultSet = OrderList.query.\
+                filter(OrderList.Creator==profile.user_id).\
+                filter(OrderList.CreateDate > ExpireDatetime).\
+                first()
+
+            # PostbackAction carry order list id.
+            confirmLaunch = TemplateSendMessage(
+                alt_text='Buttons template',
+                template=ButtonsTemplate(
+                    thumbnail_image_url=dict[drinkVender],
+                    text='請選擇動作或者是忽視這則訊息',
+                    actions=[
+                        URIAction(
+                            label='菜單',
+                            uri=dict[recipeURL]
+                        ),
+                        PostbackAction(
+                            label='跟團',
+                            data='action=FollowOrder&itemid={0}'.format(ResultSet[0].Id)
+                        )
+                    ]
+                )
+            )
+
+            line_bot_api.multicast(userIDs, 
+                messages=[
+                    TextSendMessage(text=broadcastMessage),
+                    confirmLaunch
                 ]
             )
-        )
-        line_bot_api.reply_message(event.reply_token, confirmLaunch)
 
-        # line_bot_api.multicast(userID, 
-        #     messages=[
-        #         TextSendMessage(text=broadcastMessage),
+    elif match.group(2) == 'FollowOrder':
 
-        #     ]
-        # )
+        # Check this order whether expired or not.
+        ExpireDatetime = datetime.datetime.now() - datetime.timedelta(minutes=ORDER_EXPIRED_TIME)
+        ResultSet = OrderList.query.\
+                filter(OrderList.Id==match.group(4)).\
+                filter(OrderList.CreateDate > ExpireDatetime).\
+                first()
 
-    else:
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=event.postback.data + '4'))
+        if ResultSet is None:
+            line_bot_api.reply_message(
+                event.reply_token, TextSendMessage(text="這次的揪團已經過期，請追蹤其他的揪團。"))
+        else:
+            line_bot_api.reply_message(
+                event.reply_token, 
+                TextSendMessage(text='''
+                    請按照下面的字串格式進行點單： 
+                    團號/尺寸/品名/甜度/冰塊
+                    Ex: 1/大/珍珠奶茶/半糖/去冰
+                    '''
+                ),
+                TextSendMessage(text='你所選擇的揪團團號是: {0}'.format(match.group(4))
+                )
+            )
 
 @handler.add(FollowEvent)
 def handle_follow(event):
