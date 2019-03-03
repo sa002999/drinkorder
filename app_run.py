@@ -58,9 +58,14 @@ def callback():
 def handle_message(event):
     
     msg = event.message.text
+
     # message: 團號/尺寸/品名/甜度/冰塊
     pattern = re.compile(r"(\S+)/(\S+)/(\S+)/(\S+)/(\S+)")
     match = pattern.match(msg)
+
+    # message: 查看揪團/團號
+    pattern = re.compile(r"(\S+)/(\S+)")
+    match1 = pattern.match(msg)
     
     if msg == '招喚菜單':
         DrinkVenders = TemplateSendMessage(
@@ -122,10 +127,38 @@ def handle_message(event):
         )
         line_bot_api.reply_message(event.reply_token, SelectDrinkVender)
 
+    elif msg == '發起中的訂單':
+        ExpireDatetime = datetime.datetime.utcnow() - datetime.timedelta(minutes=ORDER_EXPIRED_TIME)
+        ResultSet = OrderList.query.\
+            filter(OrderList.CreateDate > ExpireDatetime).\
+            all()
+
+        if ResultSet is None:
+            line_bot_api.reply_message(
+                event.reply_token, 
+                TextSendMessage(text='目前尚無發起中的訂單。'))
+        else:
+            orderlist_string = '[團號], [發起人], [飲料]'
+            for result in ResultSet:
+                ResultSet1 = UserData.query.\
+                    filter(UserData.UserID==result.Creator).\
+                    first()
+                orderlist_string = orderlist_string + \
+                    '\n{0}, {1}, {2}'.format(result.Id, ResultSet1.DisplayName, result.DrinkVender)
+
+                line_bot_api.reply_message(
+                    event.reply_token, 
+                    TextSendMessage(text=orderlist_string))
+
+                line_bot_api.push_message(
+                    event.source.user_id, 
+                    TextSendMessage(text="你要查看哪個揪團目前的統計情況呢?請輸入 查看揪團/團號\nEx: 查看揪團/7"))
+        
+
     elif not match is None:
 
         # Check if the order_id is correct or not.
-        ExpireDatetime = datetime.datetime.now() - datetime.timedelta(minutes=ORDER_EXPIRED_TIME)
+        ExpireDatetime = datetime.datetime.utcnow() - datetime.timedelta(minutes=ORDER_EXPIRED_TIME)
         ResultSet1 = OrderList.query.\
                 filter(OrderList.Id==match.group(1)).\
                 filter(OrderList.CreateDate > ExpireDatetime).\
@@ -174,7 +207,22 @@ def handle_message(event):
                 print(e.error.message)
                 print(e.error.details)
 
+    elif not match1 is None:
+        ResultSet = OrderDetail.query.\
+            filter(OrderDetail.Order_Index==match1.group(2)).\
+            all()
 
+        if ResultSet is None:
+            print('有bug, 不要告訴別人。')
+        else:
+            orderdetail_string = ''
+            for result in ResultSet:
+                ResultSet1 = UserData.query.\
+                    filter(UserData.UserID==result.Orderer).\
+                    first()
+                orderdetail_string = orderdetail_string + '\n{0}, {1}, {2}, {3}, {4}'.\
+                    format(ResultSet1.DisplayName, result.Drink_Size, result.Drink_Item, \
+                        result.Drink_Ice, result.Drink_Sugar)
 
     else:
         line_bot_api.reply_message(
@@ -218,7 +266,7 @@ def handle_postback(event):
 
         # Check if there is repeated order.
         # The order created within 4 hours is valid.
-        ExpireDatetime = datetime.datetime.now() - datetime.timedelta(minutes=ORDER_EXPIRED_TIME)
+        ExpireDatetime = datetime.datetime.utcnow() - datetime.timedelta(minutes=ORDER_EXPIRED_TIME)
         ResultSet = OrderList.query.\
             filter(OrderList.Creator==profile.user_id).\
             filter(OrderList.CreateDate > ExpireDatetime).\
@@ -285,7 +333,7 @@ def handle_postback(event):
     elif match.group(2) == 'FollowOrder':
 
         # Check this order whether expired or not.
-        ExpireDatetime = datetime.datetime.now() - datetime.timedelta(minutes=ORDER_EXPIRED_TIME)
+        ExpireDatetime = datetime.datetime.utcnow() - datetime.timedelta(minutes=ORDER_EXPIRED_TIME)
         ResultSet = OrderList.query.\
                 filter(OrderList.Id==match.group(4)).\
                 filter(OrderList.CreateDate > ExpireDatetime).\
@@ -297,11 +345,9 @@ def handle_postback(event):
         else:
             line_bot_api.reply_message(
                 event.reply_token, 
-                TextSendMessage(text='''
-                    請按照下面的字串格式進行點單： 
-                    團號/尺寸/品名/甜度/冰塊
-                    Ex: 1/大/珍珠奶茶/半糖/去冰
-                    '''
+                TextSendMessage(text='請按照下面的字串格式進行點單：' +
+                                     '團號/尺寸/品名/甜度/冰塊' +
+                                     'Ex: 1/大/珍珠奶茶/半糖/去冰'
                 )
             )
             line_bot_api.push_message(
