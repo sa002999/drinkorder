@@ -208,27 +208,31 @@ def handle_message(event):
                 print(e.error.details)
 
     elif not match1 is None:
-        ResultSet = OrderDetail.query.\
-            filter(OrderDetail.Order_Index==match1.group(2)).\
-            all()
+        if match1.group(1) == '查看揪團':
+            ResultSet = OrderDetail.query.\
+                filter(OrderDetail.Order_Index==match1.group(2)).\
+                all()
 
-        if ResultSet is None:
-            line_bot_api.reply_message(
-                event.reply_token, 
-                TextSendMessage(text='有bug, 不要告訴別人。'))
+            if ResultSet is None:
+                line_bot_api.reply_message(
+                    event.reply_token, 
+                    TextSendMessage(text='有bug, 不要告訴別人。'))
+            else:
+                orderdetail_string = ''
+                for result in ResultSet:
+                    ResultSet1 = UserData.query.\
+                        filter(UserData.UserID==result.Orderer).\
+                        first()
+                    orderdetail_string = orderdetail_string + '{0}, {1}, {2}, {3}, {4}\n'.\
+                        format(ResultSet1.DisplayName, result.Drink_Size, result.Drink_Item, \
+                            result.Drink_Ice, result.Drink_Sugar)
+
+                line_bot_api.reply_message(
+                    event.reply_token, 
+                    TextSendMessage(text=orderdetail_string.rstrip()))
         else:
-            orderdetail_string = ''
-            for result in ResultSet:
-                ResultSet1 = UserData.query.\
-                    filter(UserData.UserID==result.Orderer).\
-                    first()
-                orderdetail_string = orderdetail_string + '\n{0}, {1}, {2}, {3}, {4}'.\
-                    format(ResultSet1.DisplayName, result.Drink_Size, result.Drink_Item, \
-                        result.Drink_Ice, result.Drink_Sugar)
-                    
             line_bot_api.reply_message(
-                event.reply_token, 
-                TextSendMessage(text=orderdetail_string))
+                event.reply_token, TextSendMessage(text=msg))
 
     else:
         line_bot_api.reply_message(
