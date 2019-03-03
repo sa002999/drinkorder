@@ -213,7 +213,9 @@ def handle_message(event):
             all()
 
         if ResultSet is None:
-            print('有bug, 不要告訴別人。')
+            line_bot_api.reply_message(
+                event.reply_token, 
+                TextSendMessage(text='有bug, 不要告訴別人。'))
         else:
             orderdetail_string = ''
             for result in ResultSet:
@@ -223,6 +225,10 @@ def handle_message(event):
                 orderdetail_string = orderdetail_string + '\n{0}, {1}, {2}, {3}, {4}'.\
                     format(ResultSet1.DisplayName, result.Drink_Size, result.Drink_Item, \
                         result.Drink_Ice, result.Drink_Sugar)
+                    
+            line_bot_api.reply_message(
+                event.reply_token, 
+                TextSendMessage(text=orderdetail_string))
 
     else:
         line_bot_api.reply_message(
