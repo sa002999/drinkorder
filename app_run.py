@@ -213,10 +213,10 @@ def handle_message(event):
                 filter(OrderDetail.Order_Index==match1.group(2)).\
                 all()
 
-            if ResultSet is None:
+            if len(ResultSet) is 0:
                 line_bot_api.reply_message(
                     event.reply_token, 
-                    TextSendMessage(text='有bug, 不要告訴別人。'))
+                    TextSendMessage(text='你故意的對不對!'))
             else:
                 orderdetail_string = ''
                 for result in ResultSet:
