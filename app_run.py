@@ -138,21 +138,21 @@ def handle_message(event):
                 event.reply_token, 
                 TextSendMessage(text='目前尚無發起中的訂單。'))
         else:
-            orderlist_string = '[團號], [發起人], [飲料]'
+            orderlist_string = '[團號]\t[發起人]\t[飲料]'
             for result in ResultSet:
                 ResultSet1 = UserData.query.\
                     filter(UserData.UserID==result.Creator).\
                     first()
                 orderlist_string = orderlist_string + \
-                    '\n{0}, {1}, {2}'.format(result.Id, ResultSet1.DisplayName, result.DrinkVender)
+                    '\n{0}\t{1}\t{2}'.format(result.Id, ResultSet1.DisplayName, result.DrinkVender)
 
-                line_bot_api.reply_message(
-                    event.reply_token, 
-                    TextSendMessage(text=orderlist_string))
+            line_bot_api.reply_message(
+                event.reply_token, 
+                TextSendMessage(text=orderlist_string))
 
-                line_bot_api.push_message(
-                    event.source.user_id, 
-                    TextSendMessage(text="你要查看哪個揪團目前的統計情況呢?請輸入 查看揪團/團號\nEx: 查看揪團/7"))
+            line_bot_api.push_message(
+                event.source.user_id, 
+                TextSendMessage(text="你要查看哪個揪團目前的統計情況呢?\n請輸入 查看揪團/團號\nEx: 查看揪團/7"))
         
 
     elif not match is None:
@@ -190,8 +190,12 @@ def handle_message(event):
                 db.session.add(insert_data)
                 db.session.commit()
 
+                ResultSet = OrderList.query.\
+                    filter(OrderList.Id==match.group(1)).\
+                    first()
+
                 ResultSet = UserData.query.\
-                    filter(UserData.UserID==event.source.user_id).\
+                    filter(UserData.UserID==ResultSet.Creator).\
                     first()
 
                 line_bot_api.reply_message(
@@ -284,7 +288,7 @@ def handle_postback(event):
 
         if not ResultSet is None:
             line_bot_api.reply_message(
-                event.reply_token, TextSendMessage(text="你曾在四小時以內揪團過了，請查看揪團狀況。"))
+                event.reply_token, TextSendMessage(text="你曾在過去兩小時以內揪團過了，請查看揪團狀況。"))
         else:
 
             # query userID of all my friends from database
@@ -355,8 +359,8 @@ def handle_postback(event):
         else:
             line_bot_api.reply_message(
                 event.reply_token, 
-                TextSendMessage(text='請按照下面的字串格式進行點單：' +
-                                     '團號/尺寸/品名/甜度/冰塊' +
+                TextSendMessage(text='請按照下面的字串格式進行點單：\n' +
+                                     '團號/尺寸/品名/甜度/冰塊\n' +
                                      'Ex: 1/大/珍珠奶茶/半糖/去冰'
                 )
             )
