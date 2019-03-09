@@ -15,15 +15,15 @@ Installations
 -------------
 1. Install and update **flask**.
 
-::
-
+```
     $ pip install -U Flask
+```
 
 2. Install **line-bot-sdk-python**.
 
-::
-
+```
     $ pip install line-bot-sdk
+```
 
 3. Install **Flask-Migrate**. Please refer to [Flask-Migrate-Tutorial].
 
