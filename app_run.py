@@ -16,8 +16,6 @@ app = Flask(__name__)
 # get enviroment variables
 YOUR_CHANNEL_ACCESS_TOKEN = os.environ["LINE_CHANNEL_ACCESS_TOKEN"]
 YOUR_CHANNEL_SECRET = os.environ["LINE_CHANNEL_SECRET"]
-# YOUR_CHANNEL_ACCESS_TOKEN = 'A1bAwdQQlNuXHr39n9FlIWJUNU9o9eKp7PgBRgcZvylPXrxYL2rL/EzFqyElim1EvlaNx0Q2TK8Q0NhS6rWh/UQf+zH5gFdhDa4gFQf30aTWBkHLF7bqM+qRSDB4BdA+tG4oEj3KnnIpzxynrfZwKgdB04t89/1O/w1cDnyilFU='
-# YOUR_CHANNEL_SECRET = '4fa1cd3db4950fafcdcc4b10fc4abd78'
 
 line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
@@ -152,7 +150,11 @@ def handle_message(event):
 
             line_bot_api.push_message(
                 event.source.user_id, 
-                TextSendMessage(text="你要查看哪個揪團目前的統計情況呢?\n請輸入 查看揪團/團號\nEx: 查看揪團/7"))
+                TextSendMessage(text="你要查看哪個揪團目前的統計情況呢?\n請輸入 查看揪團/團號"))
+
+            line_bot_api.push_message(
+                event.source.user_id, 
+                TextSendMessage(text="Ex: 查看揪團/7"))
         
 
     elif not match is None:
@@ -164,11 +166,11 @@ def handle_message(event):
                 filter(OrderList.CreateDate > ExpireDatetime).\
                 first()
 
-        # Check if there is repeated orderer in the same order.
-        ResultSet2 = OrderDetail.query.\
-                filter(OrderDetail.Order_Index==match.group(1)).\
-                filter(OrderDetail.Orderer==event.source.user_id).\
-                first()
+        # # Check if there is repeated orderer in the same order.
+        # ResultSet2 = OrderDetail.query.\
+        #         filter(OrderDetail.Order_Index==match.group(1)).\
+        #         filter(OrderDetail.Orderer==event.source.user_id).\
+        #         first()
 
         if ResultSet1 is None:
             line_bot_api.reply_message(
@@ -177,7 +179,8 @@ def handle_message(event):
                         text='團號 {0} 有誤，可能是錯誤輸入或者是該團號之揪團已過期。'.format(match.group(1))
                     )
             )
-        elif not ResultSet1 is None and ResultSet2 is None:
+        # elif not ResultSet1 is None and ResultSet2 is None:
+        else:
             try:
                 # message: 團號/尺寸/品名/甜度/冰塊
                 insert_data = OrderDetail(Order_Index = match.group(1)
@@ -213,17 +216,31 @@ def handle_message(event):
 
     elif not match1 is None:
         if match1.group(1) == '查看揪團':
-            ResultSet = OrderDetail.query.\
+
+            # Check if the order_id is correct or not.
+            ExpireDatetime = datetime.datetime.utcnow() - datetime.timedelta(minutes=ORDER_EXPIRED_TIME)
+            ResultSet1 = OrderList.query.\
+                    filter(OrderList.Id==match.group(2)).\
+                    filter(OrderList.CreateDate > ExpireDatetime).\
+                    first()
+
+            ResultSet2 = OrderDetail.query.\
                 filter(OrderDetail.Order_Index==match1.group(2)).\
                 all()
 
-            if len(ResultSet) is 0:
+            if ResultSet1 is None:
                 line_bot_api.reply_message(
                     event.reply_token, 
-                    TextSendMessage(text='你故意的對不對!'))
+                    TextSendMessage(text='團號 {0} 有誤，可能是錯誤輸入或者是該團號之揪團已過期。'.format(match.group(2))
+                    )
+                )
+            elif not ResultSet1 is None or len(ResultSet2) is 0::
+                line_bot_api.reply_message(
+                    event.reply_token, 
+                    TextSendMessage(text='目前仍沒有人跟團，被邊緣中...'))
             else:
                 orderdetail_string = ''
-                for result in ResultSet:
+                for result in ResultSet2:
                     ResultSet1 = UserData.query.\
                         filter(UserData.UserID==result.Orderer).\
                         first()
@@ -360,10 +377,12 @@ def handle_postback(event):
             line_bot_api.reply_message(
                 event.reply_token, 
                 TextSendMessage(text='請按照下面的字串格式進行點單：\n' +
-                                     '團號/尺寸/品名/甜度/冰塊\n' +
-                                     'Ex: 1/大/珍珠奶茶/半糖/去冰'
+                                     '團號/尺寸/品名/甜度/冰塊'
                 )
             )
+            line_bot_api.push_message(
+                event.source.user_id, 
+                TextSendMessage(text='Ex: 1/大/珍珠奶茶/半糖/去冰'))
             line_bot_api.push_message(
                 event.source.user_id, 
                 TextSendMessage(text='你所選擇的揪團團號是: {0}'.format(match.group(4))))
