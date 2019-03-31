@@ -535,7 +535,7 @@ def handle_message(event):
 
         line_bot_api.reply_message(event.reply_token, SelectDrinkVender)
 
-    elif msg == '誰在開團':
+    elif msg == '誰在揪團':
         ExpireDatetime = datetime.datetime.utcnow() - datetime.timedelta(minutes=ORDER_EXPIRED_TIME)
         ResultSet = OrderList.query.\
             filter(OrderList.CreateDate > ExpireDatetime).\
@@ -794,15 +794,15 @@ def handle_postback(event):
                 )
             )
 
-            # line_bot_api.multicast(userIDs, 
-            #     messages=[
-            #         TextSendMessage(text=broadcastMessage),
-            #         confirmLaunch
-            #     ]
-            # )
+            line_bot_api.multicast(userIDs, 
+                messages=[
+                    TextSendMessage(text=broadcastMessage),
+                    confirmLaunch
+                ]
+            )
 
             # for self testing use...
-            line_bot_api.reply_message(event.reply_token, confirmLaunch)
+            # line_bot_api.reply_message(event.reply_token, confirmLaunch)
 
     elif match.group(2) == 'FollowOrder':
 
@@ -861,14 +861,14 @@ def handle_postback(event):
             for _userid in ResultSet1:
                 userIDs.append(_userid.Orderer)
 
-            # line_bot_api.multicast(
-            #     userIDs, TextSendMessage(text="恭喜團號{0}已成團，後續狀況請洽詢主揪人。".format(match.group(4)))
-            # )
+            line_bot_api.multicast(
+                userIDs, TextSendMessage(text="恭喜團號{0}已成團，後續狀況請洽詢主揪人。".format(match.group(4)))
+            )
 
             # for self testing use...
-            line_bot_api.reply_message(
-                event.reply_token, TextSendMessage(text="恭喜團號{0}已成團，後續狀況請洽詢主揪人。".format(match.group(4)))
-            )
+            # line_bot_api.reply_message(
+            #     event.reply_token, TextSendMessage(text="恭喜團號{0}已成團，後續狀況請洽詢主揪人。".format(match.group(4)))
+            # )
 
 @handler.add(FollowEvent)
 def handle_follow(event):
