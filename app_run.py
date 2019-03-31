@@ -589,7 +589,7 @@ def handle_message(event):
 
         line_bot_api.reply_message(
                 event.reply_token, 
-                TextSendMessage(text=orderdetail_string))
+                TextSendMessage(text=orderdetail_string.rstrip()))
         
     # check drinks order
     elif not match is None:
@@ -853,7 +853,7 @@ def handle_postback(event):
                 event.reply_token, TextSendMessage(text="這次的揪團已經過期，或者，你不是主揪人你怎麼知道有沒有成團嘖嘖。"))
         else:
             ResultSet1 = OrderDetail.query.\
-                filter(OrderDetail.Order_Index==match1.group(4)).\
+                filter(OrderDetail.Order_Index==match.group(4)).\
                 all()
 
             # creat a list of userID before broadcast drink order completed message
@@ -862,12 +862,12 @@ def handle_postback(event):
                 userIDs.append(_userid.Orderer)
 
             # line_bot_api.multicast(
-            #     userIDs, TextSendMessage(text="恭喜團號{0}已成團，後續狀況請洽詢主揪人。".format(match1.group(4)))
+            #     userIDs, TextSendMessage(text="恭喜團號{0}已成團，後續狀況請洽詢主揪人。".format(match.group(4)))
             # )
 
             # for self testing use...
             line_bot_api.reply_message(
-                event.reply_token, TextSendMessage(text="恭喜團號{0}已成團，後續狀況請洽詢主揪人。".format(match1.group(4)))
+                event.reply_token, TextSendMessage(text="恭喜團號{0}已成團，後續狀況請洽詢主揪人。".format(match.group(4)))
             )
 
 @handler.add(FollowEvent)
