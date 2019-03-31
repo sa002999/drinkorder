@@ -388,76 +388,76 @@ def handle_message(event):
                         #         ]
                         #     )
                         # ),
-                        # BubbleContainer(
-                        #     # image
-                        #     hero=ImageComponent(
-                        #         url=dict['coco-tea_image'],
-                        #         size='full',
-                        #         aspect_ratio='20:13',
-                        #         aspect_mode='cover'
-                        #     ),
-                        #     # body
-                        #     body=BoxComponent(
-                        #         layout='vertical',
-                        #         spacing='sm',
-                        #         contents=[
-                        #             # branch
-                        #             TextComponent(
-                        #                 text=dict['coco-tea_branch'], 
-                        #                 size='xl', 
-                        #                 weight='bold', 
-                        #                 color='#000000'
-                        #             ),
-                        #             # telphone
-                        #             BoxComponent(
-                        #                 layout='horizontal',
-                        #                 contents=[
-                        #                     TextComponent(
-                        #                         text='電話: ', 
-                        #                         size='lg', 
-                        #                         weight='bold', 
-                        #                         color='#000000'
-                        #                     ),
-                        #                     TextComponent(
-                        #                         text=dict['coco-tea_branch_phone'], 
-                        #                         size='lg', 
-                        #                         weight='bold', 
-                        #                         color='#000000'
-                        #                     )
-                        #                 ]
-                        #             ),
-                        #             # note
-                        #             TextComponent(
-                        #                 text=dict['coco-tea_branch_note'], 
-                        #                 size='xxs', 
-                        #                 margin="md", 
-                        #                 color='#FF0000'
-                        #             )
-                        #         ]
-                        #     ),
-                        #     footer=BoxComponent(
-                        #         layout='vertical',
-                        #         spacing='sm',
-                        #         contents=[
-                        #             # recipe
-                        #             ButtonComponent(
-                        #                 style='secondary',
-                        #                 action=URIAction(
-                        #                     label='菜單', 
-                        #                     uri=dict['coco-tea_recipe']
-                        #                 )
-                        #             ),
-                        #             # launch order
-                        #             ButtonComponent(
-                        #                 style='primary',
-                        #                 action=PostbackAction(
-                        #                     label='揪團', 
-                        #                     data='action=SelectDrinkVender&item=coco-tea'
-                        #                 )
-                        #             )
-                        #         ]
-                        #     )
-                        # ),
+                        BubbleContainer(
+                            # image
+                            hero=ImageComponent(
+                                url=dict['coco-tea_image'],
+                                size='full',
+                                aspect_ratio='20:13',
+                                aspect_mode='cover'
+                            ),
+                            # body
+                            body=BoxComponent(
+                                layout='vertical',
+                                spacing='sm',
+                                contents=[
+                                    # branch
+                                    TextComponent(
+                                        text=dict['coco-tea_branch'], 
+                                        size='xl', 
+                                        weight='bold', 
+                                        color='#000000'
+                                    ),
+                                    # telphone
+                                    BoxComponent(
+                                        layout='horizontal',
+                                        contents=[
+                                            TextComponent(
+                                                text='電話: ', 
+                                                size='lg', 
+                                                weight='bold', 
+                                                color='#000000'
+                                            ),
+                                            TextComponent(
+                                                text=dict['coco-tea_branch_phone'], 
+                                                size='lg', 
+                                                weight='bold', 
+                                                color='#000000'
+                                            )
+                                        ]
+                                    ),
+                                    # note
+                                    TextComponent(
+                                        text=dict['coco-tea_branch_note'], 
+                                        size='xxs', 
+                                        margin="md", 
+                                        color='#FF0000'
+                                    )
+                                ]
+                            ),
+                            footer=BoxComponent(
+                                layout='vertical',
+                                spacing='sm',
+                                contents=[
+                                    # recipe
+                                    ButtonComponent(
+                                        style='secondary',
+                                        action=URIAction(
+                                            label='菜單', 
+                                            uri=dict['coco-tea_recipe']
+                                        )
+                                    ),
+                                    # launch order
+                                    ButtonComponent(
+                                        style='primary',
+                                        action=PostbackAction(
+                                            label='揪團', 
+                                            data='action=SelectDrinkVender&item=coco-tea'
+                                        )
+                                    )
+                                ]
+                            )
+                        ),
                         BubbleContainer(
                             # image
                             hero=ImageComponent(
