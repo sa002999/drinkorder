@@ -765,12 +765,15 @@ def handle_postback(event):
                 )
             )
 
-            line_bot_api.multicast(userIDs, 
-                messages=[
-                    TextSendMessage(text=broadcastMessage),
-                    confirmLaunch
-                ]
-            )
+            # line_bot_api.multicast(userIDs, 
+            #     messages=[
+            #         TextSendMessage(text=broadcastMessage),
+            #         confirmLaunch
+            #     ]
+            # )
+
+            # for self testing use...
+            line_bot_api.reply_message(event.reply_token, confirmLaunch)
 
     elif match.group(2) == 'FollowOrder':
 
