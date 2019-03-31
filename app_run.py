@@ -565,6 +565,31 @@ def handle_message(event):
             line_bot_api.push_message(
                 event.source.user_id, 
                 TextSendMessage(text="Ex: 團號/7"))
+
+    elif msg == '點單歷史':
+
+        # Get user's profile
+        try:
+            profile = line_bot_api.get_profile(event.source.user_id)
+        except LineBotApiError as e:
+            print(e.status_code)
+            print(e.error.message)
+            print(e.error.details)
+
+        ResultSet = OrderDetail.query.\
+                filter(OrderDetail.Orderer==profile.user_id).\
+                order_by(OrderDetail.Id.desc()).\
+                limit(5).\
+                all()
+        
+        orderdetail_string = ''
+        for drink in ResultSet:
+            orderdetail_string = orderdetail_string + '{0}, {1}, {2}\n'.\
+                        format(drink.Drink_Item, drink.Drink_Ice, drink.Drink_Sugar)
+
+        line_bot_api.reply_message(
+                event.reply_token, 
+                TextSendMessage(text=orderdetail_string))
         
     # check drinks order
     elif not match is None:
@@ -614,7 +639,7 @@ def handle_message(event):
                 line_bot_api.reply_message(
                     event.reply_token,
                     TextSendMessage(
-                        text='點單訊息收到，已統計至 {0} 的揪團中，後續狀況請洽詢揪團發起人。'.\
+                        text='點單訊息收到，已統計至 {0} 的揪團中，後續狀況請洽詢主揪人。'.\
                         format(ResultSet.DisplayName)
                     )
                 )
@@ -760,6 +785,10 @@ def handle_postback(event):
                         PostbackAction(
                             label='跟團',
                             data='action=FollowOrder&itemid={0}'.format(ResultSet.Id)
+                        ),
+                        PostbackAction(
+                            label='通知已成團',
+                            data='action=CompleteOrder&itemid={0}'.format(ResultSet.Id)
                         )
                     ]
                 )
@@ -801,6 +830,45 @@ def handle_postback(event):
                 event.source.user_id, 
                 TextSendMessage(text='你所選擇的揪團團號是: {0}'.format(match.group(4))))
 
+    elif match.group(2) == 'CompleteOrder':
+
+        # Get user's profile
+        try:
+            profile = line_bot_api.get_profile(event.source.user_id)
+        except LineBotApiError as e:
+            print(e.status_code)
+            print(e.error.message)
+            print(e.error.details)
+
+        # Check this order whether expired or not.
+        ExpireDatetime = datetime.datetime.utcnow() - datetime.timedelta(minutes=ORDER_EXPIRED_TIME)
+        ResultSet = OrderList.query.\
+                filter(OrderList.Id==match.group(4)).\
+                filter(OrderList.CreateDate > ExpireDatetime).\
+                filter(OrderList.Creator==profile.user_id).\
+                first()
+
+        if ResultSet is None:
+            line_bot_api.reply_message(
+                event.reply_token, TextSendMessage(text="這次的揪團已經過期，或者，你不是主揪人你怎麼知道有沒有成團嘖嘖。"))
+        else:
+            ResultSet1 = OrderDetail.query.\
+                filter(OrderDetail.Order_Index==match1.group(4)).\
+                all()
+
+            # creat a list of userID before broadcast drink order completed message
+            userIDs = []
+            for _userid in ResultSet1:
+                userIDs.append(_userid.Orderer)
+
+            # line_bot_api.multicast(
+            #     userIDs, TextSendMessage(text="恭喜團號{0}已成團，後續狀況請洽詢主揪人。".format(match1.group(4)))
+            # )
+
+            # for self testing use...
+            line_bot_api.reply_message(
+                event.reply_token, TextSendMessage(text="恭喜團號{0}已成團，後續狀況請洽詢主揪人。".format(match1.group(4)))
+            )
 
 @handler.add(FollowEvent)
 def handle_follow(event):
