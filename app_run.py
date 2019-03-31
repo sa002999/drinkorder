@@ -645,7 +645,7 @@ def handle_message(event):
                     TextSendMessage(text='團號 {0} 有誤，可能是錯誤輸入或者是該團號之揪團已過期。'.format(match1.group(2))
                     )
                 )
-            elif not ResultSet1 is None or len(ResultSet2) is 0:
+            elif not ResultSet1 is None and len(ResultSet2) is 0:
                 line_bot_api.reply_message(
                     event.reply_token, 
                     TextSendMessage(text='目前仍沒有人跟團，被邊緣中...'))
