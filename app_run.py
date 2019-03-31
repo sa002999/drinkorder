@@ -96,8 +96,8 @@ def handle_message(event):
     pattern = re.compile(r"(\S+)/(\S+)/(\S+)/(\S+)/(\S+)")
     match = pattern.match(msg)
 
-    # message: 團號/7
-    pattern = re.compile(r"(\S+)/(\S+)")
+    # message: 團號7
+    pattern = re.compile(r"(\S+)(\d+)")
     match1 = pattern.match(msg)
     
     if msg == '我要揪團':
@@ -560,11 +560,11 @@ def handle_message(event):
 
             line_bot_api.push_message(
                 event.source.user_id, 
-                TextSendMessage(text="你要查看哪個揪團目前的統計情況呢?\n請輸入 團號/X"))
+                TextSendMessage(text="你要查看哪個揪團目前的統計情況呢?\n請輸入 團號X"))
 
             line_bot_api.push_message(
                 event.source.user_id, 
-                TextSendMessage(text="Ex: 團號/7"))
+                TextSendMessage(text="Ex: 團號7"))
         
     # check drinks order
     elif not match is None:
@@ -631,7 +631,7 @@ def handle_message(event):
             # Check if the order_id is correct or not.
             ExpireDatetime = datetime.datetime.utcnow() - datetime.timedelta(minutes=ORDER_EXPIRED_TIME)
             ResultSet1 = OrderList.query.\
-                    filter(OrderList.Id==match.group(2)).\
+                    filter(OrderList.Id==match1.group(2)).\
                     filter(OrderList.CreateDate > ExpireDatetime).\
                     first()
 
