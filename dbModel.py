@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 import datetime
+import os
 
 SQLALCHEMY_DATABASE_URI = os.environ["DATABASE_URL"]
 
