@@ -103,303 +103,406 @@ def handle_message(event):
     
     if msg == '我要揪團':
 
-        # ready to launch order message
+        # # ready to launch order message
+        # SelectDrinkVender = FlexSendMessage(
+        #     alt_text='SelectDrinkVender',
+        #     contents=[
+        #         CarouselContainer(
+        #             contents=[
+        #                 BubbleContainer(
+        #                     # image
+        #                     hero=ImageComponent(
+        #                         url=dict['50blue_image'],
+        #                         size='full',
+        #                         aspect_ratio='20:13',
+        #                         aspect_mode='cover'
+        #                     ),
+        #                     # body
+        #                     body=BoxComponent(
+        #                         layout='vertical',
+        #                         spacing='sm',
+        #                         contents=[
+        #                             # branch
+        #                             TextComponent(
+        #                                 text=dict['50blue_branch'], 
+        #                                 size='xl', 
+        #                                 weight='bold', 
+        #                                 color='#000000', 
+        #                                 wrap='true'
+        #                             ),
+        #                             # telphone
+        #                             BoxComponent(
+        #                                 layout='horizontal',
+        #                                 contents=[
+        #                                     TextComponent(
+        #                                         text='電話: ', 
+        #                                         size='lg', 
+        #                                         weight='bold', 
+        #                                         color='#000000',
+        #                                         wrap='true'
+        #                                     ),
+        #                                     TextComponent(
+        #                                         text=dict['50blue_branch_phone'], 
+        #                                         size='lg', 
+        #                                         weight='bold', 
+        #                                         color='#000000',
+        #                                         wrap='true'
+        #                                     )
+        #                                 ]
+        #                             ),
+        #                             # note
+        #                             TextComponent(
+        #                                 text=dict['50blue_branch_note'], 
+        #                                 size='xxs', 
+        #                                 margin="md", 
+        #                                 color='#FF0000'
+        #                             )
+        #                         ]
+        #                     ),
+        #                     footer=BoxComponent(
+        #                         layout='vertical',
+        #                         spacing='sm',
+        #                         contents=[
+        #                             # recipe
+        #                             ButtonComponent(
+        #                                 style='secondary',
+        #                                 action=URIAction(label='菜單', uri=dict['50blue_recipe'])
+        #                             ),
+        #                             # launch order
+        #                             ButtonComponent(
+        #                                 style='primary',
+        #                                 action=PostbackAction(label='揪團', data='action=SelectDrinkVender&item=50blue')
+        #                             )
+        #                         ]
+        #                     )
+        #                 )
+        #                 # ),
+        #                 # BubbleContainer(
+        #                 #     # image
+        #                 #     hero=ImageComponent(
+        #                 #         url=dict['yifang_image'],
+        #                 #         size='full',
+        #                 #         aspect_ratio='20:13',
+        #                 #         aspect_mode='cover'
+        #                 #     ),
+        #                 #     # body
+        #                 #     body=BoxComponent(
+        #                 #         layout='vertical',
+        #                 #         spacing='sm',
+        #                 #         contents=[
+        #                 #           # branch
+        #                 #             TextComponent(text=dict['yifang_branch'], size='xl', weight='bold', color='#000000'),
+        #                 #             # telphone
+        #                 #             BoxComponent(
+        #                 #                 layout='horizontal',
+        #                 #                 contents=[
+        #                 #                   TextComponent(text='電話: ', size='lg', weight='bold', color='#000000'),
+        #                 #                   TextComponent(text=dict['yifang_branch_phone'], size='lg', weight='bold', color='#000000')
+        #                 #                 ]
+        #                 #             ),
+        #                 #             # note
+        #                 #             TextComponent(text=dict['yifang_branch_note'], size='xxs', margin="md", color='#FF0000')
+        #                 #         ]
+        #                 #     ),
+        #                 #     footer=BoxComponent(
+        #                 #         layout='vertical',
+        #                 #         spacing='sm',
+        #                 #         contents=[
+        #                 #             # recipe
+        #                 #             ButtonComponent(
+        #                 #                 style='secondary',
+        #                 #                 action=URIAction(label='菜單', uri=dict['yifang_recipe'])
+        #                 #             ),
+        #                 #             # launch order
+        #                 #           ButtonComponent(
+        #                 #                 style='primary',
+        #                 #                 action=PostbackAction(label='揪團', data='action=SelectDrinkVender&item=yifang')
+        #                 #             )
+        #                 #         ]
+        #                 #     )
+        #                 # ),
+        #                 # BubbleContainer(
+        #                 #     # image
+        #                 #     hero=ImageComponent(
+        #                 #         url=dict['tp-tea_image'],
+        #                 #         size='full',
+        #                 #         aspect_ratio='20:13',
+        #                 #         aspect_mode='cover'
+        #                 #     ),
+        #                 #     # body
+        #                 #     body=BoxComponent(
+        #                 #         layout='vertical',
+        #                 #         spacing='sm',
+        #                 #         contents=[
+        #                 #           # branch
+        #                 #             TextComponent(text=dict['tp-tea_branch'], size='xl', weight='bold', color='#000000'),
+        #                 #             # telphone
+        #                 #             BoxComponent(
+        #                 #                 layout='horizontal',
+        #                 #                 contents=[
+        #                 #                   TextComponent(text='電話: ', size='lg', weight='bold', color='#000000'),
+        #                 #                   TextComponent(text=dict['tp-tea_branch_phone'], size='lg', weight='bold', color='#000000')
+        #                 #                 ]
+        #                 #             ),
+        #                 #             # note
+        #                 #             TextComponent(text=dict['tp-tea_branch_note'], size='xxs', margin="md", color='#FF0000')
+        #                 #         ]
+        #                 #     ),
+        #                 #     footer=BoxComponent(
+        #                 #         layout='vertical',
+        #                 #         spacing='sm',
+        #                 #         contents=[
+        #                 #             # recipe
+        #                 #             ButtonComponent(
+        #                 #                 style='secondary',
+        #                 #                 action=URIAction(label='菜單', uri=dict['tp-tea_recipe'])
+        #                 #             ),
+        #                 #             # launch order
+        #                 #           ButtonComponent(
+        #                 #                 style='primary',
+        #                 #                 action=PostbackAction(label='揪團', data='action=SelectDrinkVender&item=tp-tea')
+        #                 #             )
+        #                 #         ]
+        #                 #     )
+        #                 # ),
+        #                 # BubbleContainer(
+        #                 #     # image
+        #                 #     hero=ImageComponent(
+        #                 #         url=dict['85cafe_image'],
+        #                 #         size='full',
+        #                 #         aspect_ratio='20:13',
+        #                 #         aspect_mode='cover'
+        #                 #     ),
+        #                 #     # body
+        #                 #     body=BoxComponent(
+        #                 #         layout='vertical',
+        #                 #         spacing='sm',
+        #                 #         contents=[
+        #                 #           # branch
+        #                 #             TextComponent(text=dict['85cafe_branch'], size='xl', weight='bold', color='#000000'),
+        #                 #             # telphone
+        #                 #             BoxComponent(
+        #                 #                 layout='horizontal',
+        #                 #                 contents=[
+        #                 #                   TextComponent(text='電話: ', size='lg', weight='bold', color='#000000'),
+        #                 #                   TextComponent(text=dict['85cafe_branch_phone'], size='lg', weight='bold', color='#000000')
+        #                 #                 ]
+        #                 #             ),
+        #                 #             # note
+        #                 #             TextComponent(text=dict['85cafe_branch_note'], size='xxs', margin="md", color='#FF0000')
+        #                 #         ]
+        #                 #     ),
+        #                 #     footer=BoxComponent(
+        #                 #         layout='vertical',
+        #                 #         spacing='sm',
+        #                 #         contents=[
+        #                 #             # recipe
+        #                 #             ButtonComponent(
+        #                 #                 style='secondary',
+        #                 #                 action=URIAction(label='菜單', uri=dict['85cafe_recipe'])
+        #                 #             ),
+        #                 #             # launch order
+        #                 #           ButtonComponent(
+        #                 #                 style='primary',
+        #                 #                 action=PostbackAction(label='揪團', data='action=SelectDrinkVender&item=85cafe')
+        #                 #             )
+        #                 #         ]
+        #                 #     )
+        #                 # ),
+        #                 # BubbleContainer(
+        #                 #     # image
+        #                 #     hero=ImageComponent(
+        #                 #         url=dict['coco-tea_image'],
+        #                 #         size='full',
+        #                 #         aspect_ratio='20:13',
+        #                 #         aspect_mode='cover'
+        #                 #     ),
+        #                 #     # body
+        #                 #     body=BoxComponent(
+        #                 #         layout='vertical',
+        #                 #         spacing='sm',
+        #                 #         contents=[
+        #                 #           # branch
+        #                 #             TextComponent(text=dict['coco-tea_branch'], size='xl', weight='bold', color='#000000'),
+        #                 #             # telphone
+        #                 #             BoxComponent(
+        #                 #                 layout='horizontal',
+        #                 #                 contents=[
+        #                 #                   TextComponent(text='電話: ', size='lg', weight='bold', color='#000000'),
+        #                 #                   TextComponent(text=dict['coco-tea_branch_phone'], size='lg', weight='bold', color='#000000')
+        #                 #                 ]
+        #                 #             ),
+        #                 #             # note
+        #                 #             TextComponent(text=dict['coco-tea_branch_note'], size='xxs', margin="md", color='#FF0000')
+        #                 #         ]
+        #                 #     ),
+        #                 #     footer=BoxComponent(
+        #                 #         layout='vertical',
+        #                 #         spacing='sm',
+        #                 #         contents=[
+        #                 #             # recipe
+        #                 #             ButtonComponent(
+        #                 #                 style='secondary',
+        #                 #                 action=URIAction(label='菜單', uri=dict['coco-tea_recipe'])
+        #                 #             ),
+        #                 #             # launch order
+        #                 #           ButtonComponent(
+        #                 #                 style='primary',
+        #                 #                 action=PostbackAction(label='揪團', data='action=SelectDrinkVender&item=coco-tea')
+        #                 #             )
+        #                 #         ]
+        #                 #     )
+        #                 # ),
+        #                 # BubbleContainer(
+        #                 #     # image
+        #                 #     hero=ImageComponent(
+        #                 #         url=dict['chingshin_image'],
+        #                 #         size='full',
+        #                 #         aspect_ratio='20:13',
+        #                 #         aspect_mode='cover'
+        #                 #     ),
+        #                 #     # body
+        #                 #     body=BoxComponent(
+        #                 #         layout='vertical',
+        #                 #         spacing='sm',
+        #                 #         contents=[
+        #                 #           # branch
+        #                 #             TextComponent(text=dict['chingshin_branch'], size='xl', weight='bold', color='#000000'),
+        #                 #             # telphone
+        #                 #             BoxComponent(
+        #                 #                 layout='horizontal',
+        #                 #                 contents=[
+        #                 #                   TextComponent(text='電話: ', size='lg', weight='bold', color='#000000'),
+        #                 #                   TextComponent(text=dict['chingshin_branch_phone'], size='lg', weight='bold', color='#000000')
+        #                 #                 ]
+        #                 #             ),
+        #                 #             # note
+        #                 #             TextComponent(text=dict['chingshin_branch_note'], size='xxs', margin="md", color='#FF0000')
+        #                 #         ]
+        #                 #     ),
+        #                 #     footer=BoxComponent(
+        #                 #         layout='vertical',
+        #                 #         spacing='sm',
+        #                 #         contents=[
+        #                 #             # recipe
+        #                 #             ButtonComponent(
+        #                 #                 style='secondary',
+        #                 #                 action=URIAction(label='菜單', uri=dict['chingshin_recipe'])
+        #                 #             ),
+        #                 #             # launch order
+        #                 #           ButtonComponent(
+        #                 #                 style='primary',
+        #                 #                 action=PostbackAction(label='揪團', data='action=SelectDrinkVender&item=chingshin')
+        #                 #             )
+        #                 #         ]
+        #                 #     )
+        #                 # )
+        #             ]
+        #         )
+        #     ]
+        # )
         SelectDrinkVender = FlexSendMessage(
-            alt_text='SelectDrinkVender',
-            contents=[
-                CarouselContainer(
-                    contents=[
-                        BubbleContainer(
-                            # image
-                            hero=ImageComponent(
-                                url=dict['50blue_image'],
-                                size='full',
-                                aspect_ratio='20:13',
-                                aspect_mode='cover'
+            alt_text="hello", 
+            contents=
+                BubbleContainer(
+                    direction='ltr',
+                    hero=ImageComponent(
+                        url='https://example.com/cafe.jpg',
+                        size='full',
+                        aspect_ratio='20:13',
+                        aspect_mode='cover',
+                        action=URIAction(uri='http://example.com', label='label')
+                    ),
+                    body=BoxComponent(
+                        layout='vertical',
+                        contents=[
+                            # title
+                            TextComponent(text='Brown Cafe', weight='bold', size='xl'),
+                            # review
+                            BoxComponent(
+                                layout='baseline',
+                                margin='md',
+                                contents=[
+                                    IconComponent(size='sm', url='https://example.com/gold_star.png'),
+                                    IconComponent(size='sm', url='https://example.com/grey_star.png'),
+                                    IconComponent(size='sm', url='https://example.com/gold_star.png'),
+                                    IconComponent(size='sm', url='https://example.com/gold_star.png'),
+                                    IconComponent(size='sm', url='https://example.com/grey_star.png'),
+                                    TextComponent(text='4.0', size='sm', color='#999999', margin='md',
+                                                  flex=0)
+                                ]
                             ),
-                            # body
-                            body=BoxComponent(
+                            # info
+                            BoxComponent(
                                 layout='vertical',
+                                margin='lg',
                                 spacing='sm',
                                 contents=[
-                                    # branch
-                                    TextComponent(
-                                        text=dict['50blue_branch'], 
-                                        size='xl', 
-                                        weight='bold', 
-                                        color='#000000', 
-                                        wrap='true'
-                                    ),
-                                    # telphone
                                     BoxComponent(
-                                        layout='horizontal',
+                                        layout='baseline',
+                                        spacing='sm',
                                         contents=[
                                             TextComponent(
-                                                text='電話: ', 
-                                                size='lg', 
-                                                weight='bold', 
-                                                color='#000000',
-                                                wrap='true'
+                                                text='Place',
+                                                color='#aaaaaa',
+                                                size='sm',
+                                                flex=1
                                             ),
                                             TextComponent(
-                                                text=dict['50blue_branch_phone'], 
-                                                size='lg', 
-                                                weight='bold', 
-                                                color='#000000',
-                                                wrap='true'
+                                                text='Shinjuku, Tokyo',
+                                                wrap=True,
+                                                color='#666666',
+                                                size='sm',
+                                                flex=5
                                             )
-                                        ]
+                                        ],
                                     ),
-                                    # note
-                                    TextComponent(
-                                        text=dict['50blue_branch_note'], 
-                                        size='xxs', 
-                                        margin="md", 
-                                        color='#FF0000'
-                                    )
-                                ]
-                            ),
-                            footer=BoxComponent(
-                                layout='vertical',
-                                spacing='sm',
-                                contents=[
-                                    # recipe
-                                    ButtonComponent(
-                                        style='secondary',
-                                        action=URIAction(label='菜單', uri=dict['50blue_recipe'])
+                                    BoxComponent(
+                                        layout='baseline',
+                                        spacing='sm',
+                                        contents=[
+                                            TextComponent(
+                                                text='Time',
+                                                color='#aaaaaa',
+                                                size='sm',
+                                                flex=1
+                                            ),
+                                            TextComponent(
+                                                text="10:00 - 23:00",
+                                                wrap=True,
+                                                color='#666666',
+                                                size='sm',
+                                                flex=5,
+                                            ),
+                                        ],
                                     ),
-                                    # launch order
-                                    ButtonComponent(
-                                        style='primary',
-                                        action=PostbackAction(label='揪團', data='action=SelectDrinkVender&item=50blue')
-                                    )
-                                ]
+                                ],
                             )
-                        )
-                        # ),
-                        # BubbleContainer(
-                        #     # image
-                        #     hero=ImageComponent(
-                        #         url=dict['yifang_image'],
-                        #         size='full',
-                        #         aspect_ratio='20:13',
-                        #         aspect_mode='cover'
-                        #     ),
-                        #     # body
-                        #     body=BoxComponent(
-                        #         layout='vertical',
-                        #         spacing='sm',
-                        #         contents=[
-                        #           # branch
-                        #             TextComponent(text=dict['yifang_branch'], size='xl', weight='bold', color='#000000'),
-                        #             # telphone
-                        #             BoxComponent(
-                        #                 layout='horizontal',
-                        #                 contents=[
-                        #                   TextComponent(text='電話: ', size='lg', weight='bold', color='#000000'),
-                        #                   TextComponent(text=dict['yifang_branch_phone'], size='lg', weight='bold', color='#000000')
-                        #                 ]
-                        #             ),
-                        #             # note
-                        #             TextComponent(text=dict['yifang_branch_note'], size='xxs', margin="md", color='#FF0000')
-                        #         ]
-                        #     ),
-                        #     footer=BoxComponent(
-                        #         layout='vertical',
-                        #         spacing='sm',
-                        #         contents=[
-                        #             # recipe
-                        #             ButtonComponent(
-                        #                 style='secondary',
-                        #                 action=URIAction(label='菜單', uri=dict['yifang_recipe'])
-                        #             ),
-                        #             # launch order
-                        #           ButtonComponent(
-                        #                 style='primary',
-                        #                 action=PostbackAction(label='揪團', data='action=SelectDrinkVender&item=yifang')
-                        #             )
-                        #         ]
-                        #     )
-                        # ),
-                        # BubbleContainer(
-                        #     # image
-                        #     hero=ImageComponent(
-                        #         url=dict['tp-tea_image'],
-                        #         size='full',
-                        #         aspect_ratio='20:13',
-                        #         aspect_mode='cover'
-                        #     ),
-                        #     # body
-                        #     body=BoxComponent(
-                        #         layout='vertical',
-                        #         spacing='sm',
-                        #         contents=[
-                        #           # branch
-                        #             TextComponent(text=dict['tp-tea_branch'], size='xl', weight='bold', color='#000000'),
-                        #             # telphone
-                        #             BoxComponent(
-                        #                 layout='horizontal',
-                        #                 contents=[
-                        #                   TextComponent(text='電話: ', size='lg', weight='bold', color='#000000'),
-                        #                   TextComponent(text=dict['tp-tea_branch_phone'], size='lg', weight='bold', color='#000000')
-                        #                 ]
-                        #             ),
-                        #             # note
-                        #             TextComponent(text=dict['tp-tea_branch_note'], size='xxs', margin="md", color='#FF0000')
-                        #         ]
-                        #     ),
-                        #     footer=BoxComponent(
-                        #         layout='vertical',
-                        #         spacing='sm',
-                        #         contents=[
-                        #             # recipe
-                        #             ButtonComponent(
-                        #                 style='secondary',
-                        #                 action=URIAction(label='菜單', uri=dict['tp-tea_recipe'])
-                        #             ),
-                        #             # launch order
-                        #           ButtonComponent(
-                        #                 style='primary',
-                        #                 action=PostbackAction(label='揪團', data='action=SelectDrinkVender&item=tp-tea')
-                        #             )
-                        #         ]
-                        #     )
-                        # ),
-                        # BubbleContainer(
-                        #     # image
-                        #     hero=ImageComponent(
-                        #         url=dict['85cafe_image'],
-                        #         size='full',
-                        #         aspect_ratio='20:13',
-                        #         aspect_mode='cover'
-                        #     ),
-                        #     # body
-                        #     body=BoxComponent(
-                        #         layout='vertical',
-                        #         spacing='sm',
-                        #         contents=[
-                        #           # branch
-                        #             TextComponent(text=dict['85cafe_branch'], size='xl', weight='bold', color='#000000'),
-                        #             # telphone
-                        #             BoxComponent(
-                        #                 layout='horizontal',
-                        #                 contents=[
-                        #                   TextComponent(text='電話: ', size='lg', weight='bold', color='#000000'),
-                        #                   TextComponent(text=dict['85cafe_branch_phone'], size='lg', weight='bold', color='#000000')
-                        #                 ]
-                        #             ),
-                        #             # note
-                        #             TextComponent(text=dict['85cafe_branch_note'], size='xxs', margin="md", color='#FF0000')
-                        #         ]
-                        #     ),
-                        #     footer=BoxComponent(
-                        #         layout='vertical',
-                        #         spacing='sm',
-                        #         contents=[
-                        #             # recipe
-                        #             ButtonComponent(
-                        #                 style='secondary',
-                        #                 action=URIAction(label='菜單', uri=dict['85cafe_recipe'])
-                        #             ),
-                        #             # launch order
-                        #           ButtonComponent(
-                        #                 style='primary',
-                        #                 action=PostbackAction(label='揪團', data='action=SelectDrinkVender&item=85cafe')
-                        #             )
-                        #         ]
-                        #     )
-                        # ),
-                        # BubbleContainer(
-                        #     # image
-                        #     hero=ImageComponent(
-                        #         url=dict['coco-tea_image'],
-                        #         size='full',
-                        #         aspect_ratio='20:13',
-                        #         aspect_mode='cover'
-                        #     ),
-                        #     # body
-                        #     body=BoxComponent(
-                        #         layout='vertical',
-                        #         spacing='sm',
-                        #         contents=[
-                        #           # branch
-                        #             TextComponent(text=dict['coco-tea_branch'], size='xl', weight='bold', color='#000000'),
-                        #             # telphone
-                        #             BoxComponent(
-                        #                 layout='horizontal',
-                        #                 contents=[
-                        #                   TextComponent(text='電話: ', size='lg', weight='bold', color='#000000'),
-                        #                   TextComponent(text=dict['coco-tea_branch_phone'], size='lg', weight='bold', color='#000000')
-                        #                 ]
-                        #             ),
-                        #             # note
-                        #             TextComponent(text=dict['coco-tea_branch_note'], size='xxs', margin="md", color='#FF0000')
-                        #         ]
-                        #     ),
-                        #     footer=BoxComponent(
-                        #         layout='vertical',
-                        #         spacing='sm',
-                        #         contents=[
-                        #             # recipe
-                        #             ButtonComponent(
-                        #                 style='secondary',
-                        #                 action=URIAction(label='菜單', uri=dict['coco-tea_recipe'])
-                        #             ),
-                        #             # launch order
-                        #           ButtonComponent(
-                        #                 style='primary',
-                        #                 action=PostbackAction(label='揪團', data='action=SelectDrinkVender&item=coco-tea')
-                        #             )
-                        #         ]
-                        #     )
-                        # ),
-                        # BubbleContainer(
-                        #     # image
-                        #     hero=ImageComponent(
-                        #         url=dict['chingshin_image'],
-                        #         size='full',
-                        #         aspect_ratio='20:13',
-                        #         aspect_mode='cover'
-                        #     ),
-                        #     # body
-                        #     body=BoxComponent(
-                        #         layout='vertical',
-                        #         spacing='sm',
-                        #         contents=[
-                        #           # branch
-                        #             TextComponent(text=dict['chingshin_branch'], size='xl', weight='bold', color='#000000'),
-                        #             # telphone
-                        #             BoxComponent(
-                        #                 layout='horizontal',
-                        #                 contents=[
-                        #                   TextComponent(text='電話: ', size='lg', weight='bold', color='#000000'),
-                        #                   TextComponent(text=dict['chingshin_branch_phone'], size='lg', weight='bold', color='#000000')
-                        #                 ]
-                        #             ),
-                        #             # note
-                        #             TextComponent(text=dict['chingshin_branch_note'], size='xxs', margin="md", color='#FF0000')
-                        #         ]
-                        #     ),
-                        #     footer=BoxComponent(
-                        #         layout='vertical',
-                        #         spacing='sm',
-                        #         contents=[
-                        #             # recipe
-                        #             ButtonComponent(
-                        #                 style='secondary',
-                        #                 action=URIAction(label='菜單', uri=dict['chingshin_recipe'])
-                        #             ),
-                        #             # launch order
-                        #           ButtonComponent(
-                        #                 style='primary',
-                        #                 action=PostbackAction(label='揪團', data='action=SelectDrinkVender&item=chingshin')
-                        #             )
-                        #         ]
-                        #     )
-                        # )
-                    ]
+                        ],
+                    ),
+                    footer=BoxComponent(
+                        layout='vertical',
+                        spacing='sm',
+                        contents=[
+                            # callAction, separator, websiteAction
+                            SpacerComponent(size='sm'),
+                            # callAction
+                            ButtonComponent(
+                                style='link',
+                                height='sm',
+                                action=URIAction(label='CALL', uri='tel:000000'),
+                            ),
+                            # separator
+                            SeparatorComponent(),
+                            # websiteAction
+                            ButtonComponent(
+                                style='link',
+                                height='sm',
+                                action=URIAction(label='WEBSITE', uri="https://example.com")
+                            )
+                        ]
+                    ),
                 )
-            ]
         )
 
         line_bot_api.reply_message(event.reply_token, SelectDrinkVender)
