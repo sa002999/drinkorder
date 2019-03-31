@@ -9,6 +9,7 @@ from linebot.exceptions import (
 from linebot.models import *
 import os, re
 from dbModel import *
+from Line_Messages import *
 import datetime
 
 app = Flask(__name__)
@@ -19,16 +20,6 @@ YOUR_CHANNEL_SECRET = os.environ["LINE_CHANNEL_SECRET"]
 
 line_bot_api = LineBotApi(YOUR_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(YOUR_CHANNEL_SECRET)
-
-# declare a dictionary
-dict = {
-    '50blue_name': '50嵐',
-    '50blue_image': 'https://sites.google.com/site/50lanksu00/_/rsrc/1415903484528/config/customLogo.gif?revision=9', 
-    '50blue_recipe': 'https://bearteach.com/wp-content/uploads/02-149.jpg', 
-    'yifang_name': '一芳 台灣水果茶',
-    'yifang_image': 'https://foodtracer.taipei.gov.tw/Backend/upload/company/54591495/54591495_img2.jpg',
-    'yifang_recipe': 'http://www.yifangtea.com.tw/upload/menu/1901020908450000001.jpg'
-}
 
 ORDER_EXPIRED_TIME = 120  # minute
 
@@ -61,71 +52,14 @@ def handle_message(event):
     pattern = re.compile(r"(\S+)/(\S+)/(\S+)/(\S+)/(\S+)")
     match = pattern.match(msg)
 
-    # message: 查看揪團/團號
-    pattern = re.compile(r"(\S+)/(\S+)")
+    # message: 團號7
+    pattern = re.compile(r"(\S+)(\d+)")
     match1 = pattern.match(msg)
     
-    if msg == '招喚菜單':
-        DrinkVenders = TemplateSendMessage(
-            alt_text='DrinkVenders',
-            template=CarouselTemplate(
-                columns=[
-                    CarouselColumn(
-                        thumbnail_image_url=dict['50blue_image'],
-                        text=dict['50blue_name'],
-                        actions=[
-                            URIAction(
-                                label='菜單',
-                                uri=dict['50blue_recipe']
-                            )
-                        ]
-                    ),
-                    CarouselColumn(
-                        thumbnail_image_url=dict['yifang_image'],
-                        text=dict['yifang_name'],
-                        actions=[
-                            URIAction(
-                                label='菜單',
-                                uri=dict['yifang_recipe']
-                            )
-                        ]
-                    )
-                ]
-            )
-        )
-        line_bot_api.reply_message(event.reply_token, DrinkVenders)
-    
-    elif msg == '我要揪團':
-        SelectDrinkVender = TemplateSendMessage(
-            alt_text='SelectDrinkVender',
-            template=CarouselTemplate(
-                columns=[
-                    CarouselColumn(
-                        thumbnail_image_url=dict['50blue_image'],
-                        text=dict['50blue_name'],
-                        actions=[
-                            PostbackAction(
-                                label='選擇',
-                                data='action=SelectDrinkVender&item=50blue'
-                            )
-                        ]
-                    ),
-                    CarouselColumn(
-                        thumbnail_image_url=dict['yifang_image'],
-                        text=dict['yifang_name'],
-                        actions=[
-                            PostbackAction(
-                                label='選擇',
-                                data='action=SelectDrinkVender&item=yifang'
-                            )
-                        ]
-                    )
-                ]
-            )
-        )
-        line_bot_api.reply_message(event.reply_token, SelectDrinkVender)
+    if msg == '我要揪團':
+        line_bot_api.reply_message(event.reply_token, Messages.SelectDrinkVender)
 
-    elif msg == '發起中的訂單':
+    elif msg == '誰在開團':
         ExpireDatetime = datetime.datetime.utcnow() - datetime.timedelta(minutes=ORDER_EXPIRED_TIME)
         ResultSet = OrderList.query.\
             filter(OrderList.CreateDate > ExpireDatetime).\
@@ -150,13 +84,13 @@ def handle_message(event):
 
             line_bot_api.push_message(
                 event.source.user_id, 
-                TextSendMessage(text="你要查看哪個揪團目前的統計情況呢?\n請輸入 查看揪團/團號"))
+                TextSendMessage(text="你要查看哪個揪團目前的統計情況呢?\n請輸入 團號X"))
 
             line_bot_api.push_message(
                 event.source.user_id, 
-                TextSendMessage(text="Ex: 查看揪團/7"))
+                TextSendMessage(text="Ex: 團號7"))
         
-
+    # check drinks order
     elif not match is None:
 
         # Check if the order_id is correct or not.
@@ -214,8 +148,9 @@ def handle_message(event):
                 print(e.error.message)
                 print(e.error.details)
 
+    # look for order detail
     elif not match1 is None:
-        if match1.group(1) == '查看揪團':
+        if match1.group(1) == '團號':
 
             # Check if the order_id is correct or not.
             ExpireDatetime = datetime.datetime.utcnow() - datetime.timedelta(minutes=ORDER_EXPIRED_TIME)
@@ -234,7 +169,7 @@ def handle_message(event):
                     TextSendMessage(text='團號 {0} 有誤，可能是錯誤輸入或者是該團號之揪團已過期。'.format(match.group(2))
                     )
                 )
-            elif not ResultSet1 is None or len(ResultSet2) is 0::
+            elif not ResultSet1 is None or len(ResultSet2) is 0:
                 line_bot_api.reply_message(
                     event.reply_token, 
                     TextSendMessage(text='目前仍沒有人跟團，被邊緣中...'))
