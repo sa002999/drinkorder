@@ -642,7 +642,7 @@ def handle_message(event):
             if ResultSet1 is None:
                 line_bot_api.reply_message(
                     event.reply_token, 
-                    TextSendMessage(text='團號 {0} 有誤，可能是錯誤輸入或者是該團號之揪團已過期。'.format(match.group(2))
+                    TextSendMessage(text='團號 {0} 有誤，可能是錯誤輸入或者是該團號之揪團已過期。'.format(match1.group(2))
                     )
                 )
             elif not ResultSet1 is None or len(ResultSet2) is 0:
